@@ -15,11 +15,28 @@ export interface CrosswordQuestion {
   startY: number;
 }
 
+export interface Position {
+  x: number;
+  y: number;
+}
 export interface CrosswordCell {
-  //letter: string;
+  letter?: string;
   questionNumber: number[];
   rootCell: boolean;
   rootCellQuestionNumber: number;
+  position: Position;
+  isFocused?: boolean;
+  isFocusedDirection?: 'across' | 'down';
+  isFocusedLetter?: boolean;
+  letterPositionAcross?: number;
+  letterPositionDown?: number;
+  wordLengthAcross?: number;
+  wordLengthDown?: number;
+}
+export interface CrosswordWord {
+  letterPositions: Position[];
+  direction: 'across' | 'down';
+  isFocused?: boolean;
 }
 
 export default function handler(

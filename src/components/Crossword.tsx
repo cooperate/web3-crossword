@@ -1,8 +1,18 @@
 // components/Crossword.tsx
-import React, { ReactNode, useRef, useState } from "react";
+import React, {
+  ReactNode,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import styled from "@emotion/styled";
 import { CrosswordCell, CrosswordQuestion } from "@/pages/api/hello";
 import { keyframes } from "@emotion/react";
+import {
+  CrosswordContext,
+  CrosswordDispatchContext,
+} from "@/pages/api/CrosswordContext";
 
 const Grid = styled.div<{ size: number }>`
   display: grid;
@@ -13,7 +23,6 @@ const Grid = styled.div<{ size: number }>`
 
 interface CrosswordProps {
   size: number;
-  children: ReactNode;
 }
 
 const CrosswordWrapper = styled.div<{ size: number }>`
@@ -22,16 +31,57 @@ const CrosswordWrapper = styled.div<{ size: number }>`
   max-width: 100vw;
 `;
 
-export const Crossword: React.FC<CrosswordProps> = ({ size, children }) => {
+export const Crossword: React.FC<CrosswordProps> = ({ size }) => {
+  const { grid } = useContext(CrosswordContext);
   return (
     <CrosswordWrapper size={size}>
-      <Grid size={size}>{children}</Grid>
+      <Grid size={size}>
+        {grid.map((row, i) =>
+          row.map((cell, j) => <Cell key={`${i}-${j}`} cellData={cell} />)
+        )}
+      </Grid>
     </CrosswordWrapper>
   );
 };
 
-const CellWrapper = styled.div`
+const CellWrapper = styled.div<{
+  isFocused: boolean;
+  isFocusedDirectionColor: string;
+}>`
   position: relative;
+  background: ${(props) => (props.isFocused ? "none" : "transparent")};
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    opacity: ${(props) => (props.isFocused ? 1 : 0)};
+    transition: opacity 0.3s;
+  }
+
+  &::before {
+    background-color: ${(props) => props.isFocusedDirectionColor};
+    box-shadow: 0 0 5px ${(props) => props.isFocusedDirectionColor},
+      0 0 10px ${(props) => props.isFocusedDirectionColor},
+      0 0 20px ${(props) => props.isFocusedDirectionColor},
+      0 0 30px ${(props) => props.isFocusedDirectionColor},
+      0 0 40px ${(props) => props.isFocusedDirectionColor};
+  }
+
+  &::after {
+    background-color: ${(props) => props.isFocusedDirectionColor};
+    box-shadow: 0 0 5px ${(props) => props.isFocusedDirectionColor},
+      0 0 10px ${(props) => props.isFocusedDirectionColor},
+      0 0 20px ${(props) => props.isFocusedDirectionColor},
+      0 0 30px ${(props) => props.isFocusedDirectionColor},
+      0 0 40px ${(props) => props.isFocusedDirectionColor};
+    transform: scale(1.05);
+  }
 `;
 
 const CellNumber = styled.span`
@@ -74,7 +124,8 @@ const CellContent = styled.div<{ isBlack: boolean }>`
 
   &:focus {
     background: #292a2e;
-    &, & * {
+    &,
+    & * {
       color: #fff !important;
     }
   }
@@ -115,33 +166,84 @@ interface CellProps {
   cellData: CrosswordCell | null;
 }
 
-export const Cell: React.FC<CellProps> = ({ cellData }) => {
+export const Cell: React.FC<CellProps> = ({
+  cellData,
+}: {
+  cellData: CrosswordCell | null;
+}) => {
   const cellContentRef = useRef<HTMLDivElement>(null);
   const [enteredLetter, setEnteredLetter] = useState("");
-
+  const dispatch = useContext(CrosswordDispatchContext);
+  const { crosswordWords } = useContext(CrosswordContext);
   const handleKeyDown = (e: React.KeyboardEvent) => {
     const key = e.key.toUpperCase();
     const isAlphabetic = /^[A-Z]$/.test(key);
 
     if (isAlphabetic) {
       setEnteredLetter(key);
+      dispatch({
+        type: "SET_LETTER",
+        payload: {
+          letter: key,
+          x: cellData?.position?.x || 0,
+          y: cellData?.position?.y || 0,
+        },
+      });
+      if (cellData?.isFocusedDirection == "across") {
+        if (
+          cellData?.letterPositionAcross != undefined &&
+          cellData?.wordLengthAcross != undefined &&
+          cellData?.letterPositionAcross < cellData?.wordLengthAcross
+        ) {
+          dispatch({
+            type: "SET_LETTER_FOCUS",
+            payload: {
+              x: cellData?.position?.x + 1 || 0,
+              y: cellData?.position?.y || 0,
+            },
+          });
+        }
+      } else if (cellData?.isFocusedDirection == "down") {
+        if (
+          cellData?.letterPositionDown != undefined &&
+          cellData?.wordLengthDown != undefined &&
+          cellData?.letterPositionDown < cellData?.wordLengthDown
+        ) {
+          dispatch({
+            type: "SET_LETTER_FOCUS",
+            payload: {
+              x: cellData?.position?.x || 0,
+              y: cellData?.position?.y + 1 || 0,
+            },
+          });
+        }
+      }
     } else {
       e.preventDefault();
     }
   };
 
+  useEffect(() => {
+    if (cellContentRef.current && cellData?.isFocusedLetter) {
+      cellContentRef.current.focus();
+    }
+  }, [cellData?.isFocusedLetter]);
+
   if (!cellData) {
     return (
-      <CellWrapper>
-        <CellContent
-          isBlack={true}
-        />
+      <CellWrapper isFocusedDirectionColor={"yellow"} isFocused={false}>
+        <CellContent isBlack={true} />
       </CellWrapper>
     );
   }
 
   return (
-    <CellWrapper>
+    <CellWrapper
+      isFocusedDirectionColor={
+        cellData?.isFocusedDirection == "across" ? "red" : "blue"
+      }
+      isFocused={cellData?.isFocused || false}
+    >
       <CellContent
         ref={cellContentRef}
         isBlack={false}
@@ -149,7 +251,20 @@ export const Cell: React.FC<CellProps> = ({ cellData }) => {
         onKeyDown={handleKeyDown}
         onClick={() => {
           if (cellContentRef.current) {
-            cellContentRef.current.focus();
+            dispatch({
+              type: "SET_FOCUS_WORD",
+              payload: {
+                x: cellData?.position?.x || 0,
+                y: cellData?.position?.y || 0,
+              },
+            });
+            dispatch({
+              type: "SET_LETTER_FOCUS",
+              payload: {
+                x: cellData?.position?.x || 0,
+                y: cellData?.position?.y || 0,
+              },
+            });
           }
         }}
       >
