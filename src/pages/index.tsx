@@ -1,11 +1,81 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
+import Head from "next/head";
+import Image from "next/image";
+import { Inter, Space_Mono } from "next/font/google";
+import styles from "@/styles/Home.module.css";
+import {
+  EthereumClient,
+  w3mConnectors,
+  w3mProvider,
+} from "@web3modal/ethereum";
+import { Web3Modal } from "@web3modal/react";
+import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { arbitrum, mainnet, polygon } from "wagmi/chains";
+import { Web3Button } from "@web3modal/react";
+import { Crossword, Cell } from "../components/Crossword";
+import {
+  CrosswordCell,
+  CrosswordQuestion,
+  crosswordTestData,
+} from "./api/hello";
 
-const inter = Inter({ subsets: ['latin'] })
+const chains = [arbitrum, mainnet, polygon];
+const projectId = "9267b6388ea54a987c770a45e9b61301";
+
+const { provider } = configureChains(chains, [w3mProvider({ projectId })]);
+const wagmiClient = createClient({
+  autoConnect: true,
+  connectors: w3mConnectors({ projectId, version: 1, chains }),
+  provider,
+});
+const ethereumClient = new EthereumClient(wagmiClient, chains);
+
+const spaceMono = Space_Mono({
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+});
+
+function generateGrid(questions: CrosswordQuestion[], size: number) {
+  const grid: (CrosswordCell | null)[][] = Array.from({ length: size }, () =>
+    Array.from({ length: size }, () => null)
+  );
+
+  questions.forEach((question) => {
+    const { startX, startY } = question;
+
+    for (let i = 0; i < question.answerLength; i++) {
+      const xIndex = question.direction === "across" ? startX + i : startX;
+      const yIndex = question.direction === "down" ? startY + i : startY;
+
+      //check if cell is already occupied
+      if (grid[yIndex][xIndex] != null && i === 0) {
+        //previous question number
+        const prevQuestionNumber = grid?.[yIndex]?.[xIndex]?.questionNumber;
+        if (prevQuestionNumber) {
+          grid[yIndex][xIndex] = {
+            //letter: question.answer[i],
+            questionNumber: [...prevQuestionNumber, question.questionNumber],
+            rootCell: i === 0,
+            rootCellQuestionNumber: question.questionNumber,
+          };
+        }
+      } else {
+        grid[yIndex][xIndex] = {
+          //letter: question.answer[i],
+          questionNumber: [question.questionNumber],
+          rootCell: i === 0,
+          rootCellQuestionNumber: question.questionNumber,
+        };
+      }
+    }
+  });
+
+  return grid;
+}
 
 export default function Home() {
+  const size = 7;
+  const grid = generateGrid(crosswordTestData, size);
   return (
     <>
       <Head>
@@ -14,110 +84,18 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>src/pages/index.tsx</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
-          </div>
-        </div>
+      <WagmiConfig client={wagmiClient}>
+        <main className={`${styles.main} ${spaceMono.className}`}>
+          <Crossword size={size}>
+            {grid.map((row, i) =>
+              row.map((cell, j) => <Cell key={`${i}-${j}`} cellData={cell} />)
+            )}
+          </Crossword>
+          <Web3Button />
+        </main>
+      </WagmiConfig>
 
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
-            />
-          </div>
-        </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
+      <Web3Modal projectId={projectId} ethereumClient={ethereumClient} />
     </>
-  )
+  );
 }

@@ -5,9 +5,57 @@ type Data = {
   name: string
 }
 
+export interface CrosswordQuestion {
+  answer: string;
+  answerLength: number;
+  question: string;
+  direction: 'across' | 'down';
+  questionNumber: number;
+  startX: number;
+  startY: number;
+}
+
+export interface CrosswordCell {
+  //letter: string;
+  questionNumber: number[];
+  rootCell: boolean;
+  rootCellQuestionNumber: number;
+}
+
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
   res.status(200).json({ name: 'John Doe' })
 }
+
+
+export const crosswordTestData: CrosswordQuestion[] = [
+  {
+    answer: 'RAINBOW',
+    answerLength: 7,
+    question: 'Sky Illusion',
+    direction: 'across',
+    questionNumber: 1,
+    startX: 0,
+    startY: 0,
+  },
+  {
+    answer: 'BET',
+    answerLength: 3,
+    question: 'Wager',
+    direction: 'down',
+    questionNumber: 2,
+    startX: 4,
+    startY: 0,
+  },
+  {
+    answer: 'RED',
+    answerLength: 3,
+    question: 'Color of Blood',
+    direction: 'down',
+    questionNumber: 1,
+    startX: 0,
+    startY: 0,
+  }
+];
