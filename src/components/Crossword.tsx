@@ -13,6 +13,7 @@ import {
   CrosswordContext,
   CrosswordDispatchContext,
 } from "@/pages/api/CrosswordContext";
+import styles from "@/styles/Crossword.module.css";
 
 const Grid = styled.div<{ size: number }>`
   display: grid;
@@ -114,7 +115,7 @@ const CellContent = styled.div<{ isBlack: boolean }>`
   width: 100%;
   overflow: hidden;
   z-index: 0;
-  border-radius: 10px;
+  border-radius: ${(props) => (props.isBlack ? "0px" : "10px")};
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -157,7 +158,7 @@ const CellContent = styled.div<{ isBlack: boolean }>`
     top: 5px;
     width: calc(100% - 10px);
     height: calc(100% - 10px);
-    background: #292a2e;
+    background: #444654;
     border-radius: 7px;
   }
 `;
@@ -176,51 +177,108 @@ export const Cell: React.FC<CellProps> = ({
   const dispatch = useContext(CrosswordDispatchContext);
   const { crosswordWords } = useContext(CrosswordContext);
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    const key = e.key.toUpperCase();
-    const isAlphabetic = /^[A-Z]$/.test(key);
-
-    if (isAlphabetic) {
-      setEnteredLetter(key);
-      dispatch({
-        type: "SET_LETTER",
-        payload: {
-          letter: key,
-          x: cellData?.position?.x || 0,
-          y: cellData?.position?.y || 0,
-        },
-      });
-      if (cellData?.isFocusedDirection == "across") {
-        if (
-          cellData?.letterPositionAcross != undefined &&
-          cellData?.wordLengthAcross != undefined &&
-          cellData?.letterPositionAcross < cellData?.wordLengthAcross
-        ) {
-          dispatch({
-            type: "SET_LETTER_FOCUS",
-            payload: {
-              x: cellData?.position?.x + 1 || 0,
-              y: cellData?.position?.y || 0,
-            },
-          });
-        }
-      } else if (cellData?.isFocusedDirection == "down") {
-        if (
-          cellData?.letterPositionDown != undefined &&
-          cellData?.wordLengthDown != undefined &&
-          cellData?.letterPositionDown < cellData?.wordLengthDown
-        ) {
-          dispatch({
-            type: "SET_LETTER_FOCUS",
-            payload: {
-              x: cellData?.position?.x || 0,
-              y: cellData?.position?.y + 1 || 0,
-            },
-          });
+    //check if key down is arrow key
+    if (
+      e.key === "ArrowUp" ||
+      e.key === "ArrowDown" ||
+      e.key === "ArrowLeft" ||
+      e.key === "ArrowRight"
+    ) {
+      e.preventDefault();
+      if (cellData) {
+        switch (e.key) {
+          case "ArrowUp":
+            if (cellData?.position?.y !== 0) {
+              dispatch({
+                type: "SET_LETTER_FOCUS",
+                payload: {
+                  x: cellData?.position?.x || 0,
+                  y: cellData?.position?.y - 1 || 0,
+                },
+              });
+            }
+            break;
+          case "ArrowDown":
+            if (cellData?.position?.y !== 14) {
+              dispatch({
+                type: "SET_LETTER_FOCUS",
+                payload: {
+                  x: cellData?.position?.x || 0,
+                  y: cellData?.position?.y + 1 || 0,
+                },
+              });
+            }
+            break;
+          case "ArrowLeft":
+            if (cellData?.position?.x !== 0) {
+              dispatch({
+                type: "SET_LETTER_FOCUS",
+                payload: {
+                  x: cellData?.position?.x - 1 || 0,
+                  y: cellData?.position?.y || 0,
+                },
+              });
+            }
+            break;
+          case "ArrowRight":
+            if (cellData?.position?.x !== 14) {
+              dispatch({
+                type: "SET_LETTER_FOCUS",
+                payload: {
+                  x: cellData?.position?.x + 1 || 0,
+                  y: cellData?.position?.y || 0,
+                },
+              });
+            }
+            break;
         }
       }
     } else {
-      e.preventDefault();
+      const key = e.key.toUpperCase();
+      const isAlphabetic = /^[A-Z]$/.test(key);
+
+      if (isAlphabetic) {
+        setEnteredLetter(key);
+        dispatch({
+          type: "SET_LETTER",
+          payload: {
+            letter: key,
+            x: cellData?.position?.x || 0,
+            y: cellData?.position?.y || 0,
+          },
+        });
+        if (cellData?.isFocusedDirection == "across") {
+          if (
+            cellData?.letterPositionAcross != undefined &&
+            cellData?.wordLengthAcross != undefined &&
+            cellData?.letterPositionAcross < cellData?.wordLengthAcross
+          ) {
+            dispatch({
+              type: "SET_LETTER_FOCUS",
+              payload: {
+                x: cellData?.position?.x + 1 || 0,
+                y: cellData?.position?.y || 0,
+              },
+            });
+          }
+        } else if (cellData?.isFocusedDirection == "down") {
+          if (
+            cellData?.letterPositionDown != undefined &&
+            cellData?.wordLengthDown != undefined &&
+            cellData?.letterPositionDown < cellData?.wordLengthDown
+          ) {
+            dispatch({
+              type: "SET_LETTER_FOCUS",
+              payload: {
+                x: cellData?.position?.x || 0,
+                y: cellData?.position?.y + 1 || 0,
+              },
+            });
+          }
+        }
+      }
     }
+    e.preventDefault();
   };
 
   useEffect(() => {
@@ -231,7 +289,11 @@ export const Cell: React.FC<CellProps> = ({
 
   if (!cellData) {
     return (
-      <CellWrapper isFocusedDirectionColor={"yellow"} isFocused={false}>
+      <CellWrapper
+        className={styles.noGap}
+        isFocusedDirectionColor={"yellow"}
+        isFocused={false}
+      >
         <CellContent isBlack={true} />
       </CellWrapper>
     );
@@ -240,7 +302,7 @@ export const Cell: React.FC<CellProps> = ({
   return (
     <CellWrapper
       isFocusedDirectionColor={
-        cellData?.isFocusedDirection == "across" ? "red" : "blue"
+        cellData?.isFocusedDirection == "across" ? "#ad88b4" : "#f87225"
       }
       isFocused={cellData?.isFocused || false}
     >
