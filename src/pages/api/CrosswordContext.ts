@@ -156,11 +156,28 @@ export function crosswordReducer(
             };
         }
         case "SET_FOCUS_WORD": {
-            const { x, y, direction } = action.payload;
-            //find word based on direction and position
+            const { x, y } = action.payload;
+            //check if word is the same word as previous (if so, do nothing)
+            //check if word is on the same axis as previous (if so, make isFocused false on prev and true on new)
+            //any other word isFocused false
+            //get prev is focused word
+            const prevFocusedWord = crossword.crosswordWords.find((word) => word.isFocused);
+            //find all words with overlap of coordinates
+            const coordinateSpaceWords = crossword.crosswordWords.filter((word) => word.letterPositions.some((position) => position.x === x && position.y === y));
             const newWords = crossword.crosswordWords.map((word) => {
-                if (word.direction === direction) {
-                    if (word.letterPositions.some((position) => position.x === x && position.y === y)) {
+                if (word.letterPositions.some((position) => position.x === x && position.y === y)) {
+                    if(prevFocusedWord && prevFocusedWord.clueText === word?.clueText && prevFocusedWord?.isFocused === true && coordinateSpaceWords.length === 1) {
+                        return {
+                            ...word,
+                            isFocused: true,
+                        };
+                    } else if(prevFocusedWord && prevFocusedWord.clueText === word?.clueText && prevFocusedWord?.isFocused === true && coordinateSpaceWords.length > 1) {
+                        return {
+                            ...word,
+                            isFocused: false,
+                        };
+                    }
+                    else {
                         return {
                             ...word,
                             isFocused: true,

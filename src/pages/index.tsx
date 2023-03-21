@@ -16,6 +16,7 @@ import { useContext } from "react";
 import { CrosswordContext } from "./api/CrosswordContext";
 import { CrosswordProvider } from "@/components/CrosswordProvider";
 import ClueCard from "@/components/Clue";
+import { GRID_SIZE } from "./api/hello";
 
 const chains = [arbitrum, mainnet, polygon];
 const projectId = "9267b6388ea54a987c770a45e9b61301";
@@ -36,7 +37,7 @@ const spaceMono = Space_Mono({
 
 
 export default function Home() {
-  const size = 7;
+  const size = GRID_SIZE;
   const { grid } = useContext(CrosswordContext);
   return (
     <>

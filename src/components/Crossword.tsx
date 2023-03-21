@@ -7,7 +7,7 @@ import React, {
   useState,
 } from "react";
 import styled from "@emotion/styled";
-import { CrosswordCell, CrosswordQuestion } from "@/pages/api/hello";
+import { CrosswordCell, CrosswordQuestion, GRID_SIZE } from "@/pages/api/hello";
 import { keyframes } from "@emotion/react";
 import {
   CrosswordContext,
@@ -182,13 +182,21 @@ export const Cell: React.FC<CellProps> = ({
       e.key === "ArrowUp" ||
       e.key === "ArrowDown" ||
       e.key === "ArrowLeft" ||
-      e.key === "ArrowRight"
+      e.key === "ArrowRight" ||
+      e.key === "Backspace" ||
+      e.key === "Delete" ||
+      e.key === "Enter" ||
+      e.key === "Tab"
     ) {
       e.preventDefault();
       if (cellData) {
         switch (e.key) {
           case "ArrowUp":
-            if (cellData?.position?.y !== 0) {
+            if (
+              cellData?.position?.y !== 0 &&
+              cellData?.letterPositionDown != undefined &&
+              cellData?.wordLengthDown != undefined
+            ) {
               dispatch({
                 type: "SET_LETTER_FOCUS",
                 payload: {
@@ -201,13 +209,17 @@ export const Cell: React.FC<CellProps> = ({
                 payload: {
                   x: cellData?.position?.x || 0,
                   y: cellData?.position?.y - 1 || 0,
-                  direction: "down"
                 },
               });
             }
             break;
           case "ArrowDown":
-            if (cellData?.position?.y !== 14) {
+            if (
+              cellData?.position?.y !== GRID_SIZE &&
+              cellData?.letterPositionDown != undefined &&
+              cellData?.wordLengthDown != undefined &&
+              cellData?.letterPositionDown < cellData?.wordLengthDown - 1
+            ) {
               dispatch({
                 type: "SET_LETTER_FOCUS",
                 payload: {
@@ -220,13 +232,16 @@ export const Cell: React.FC<CellProps> = ({
                 payload: {
                   x: cellData?.position?.x || 0,
                   y: cellData?.position?.y + 1 || 0,
-                  direction: "down"
                 },
               });
             }
             break;
           case "ArrowLeft":
-            if (cellData?.position?.x !== 0) {
+            if (
+              cellData?.position?.x !== 0 &&
+              cellData?.letterPositionAcross != undefined &&
+              cellData?.wordLengthAcross != undefined
+            ) {
               dispatch({
                 type: "SET_LETTER_FOCUS",
                 payload: {
@@ -239,13 +254,17 @@ export const Cell: React.FC<CellProps> = ({
                 payload: {
                   x: cellData?.position?.x - 1 || 0,
                   y: cellData?.position?.y || 0,
-                  direction: "across"
                 },
               });
             }
             break;
           case "ArrowRight":
-            if (cellData?.position?.x !== 14) {
+            if (
+              cellData?.position?.x !== GRID_SIZE &&
+              cellData?.letterPositionAcross != undefined &&
+              cellData?.wordLengthAcross != undefined &&
+              cellData?.letterPositionAcross < cellData?.wordLengthAcross - 1
+            ) {
               dispatch({
                 type: "SET_LETTER_FOCUS",
                 payload: {
@@ -258,7 +277,42 @@ export const Cell: React.FC<CellProps> = ({
                 payload: {
                   x: cellData?.position?.x + 1 || 0,
                   y: cellData?.position?.y || 0,
-                  direction: "across"
+                },
+              });
+            }
+            break;
+          case "Backspace":
+          case "Delete":
+            dispatch({
+              type: "SET_LETTER",
+              payload: {
+                letter: "",
+                x: cellData?.position?.x || 0,
+                y: cellData?.position?.y || 0,
+              },
+            });
+            if (
+              cellData?.isFocusedDirection == "across" &&
+              cellData?.letterPositionAcross != undefined &&
+              cellData?.letterPositionAcross > 0
+            ) {
+              dispatch({
+                type: "SET_LETTER_FOCUS",
+                payload: {
+                  x: cellData?.position?.x - 1 || 0,
+                  y: cellData?.position?.y || 0,
+                },
+              });
+            } else if (
+              cellData?.isFocusedDirection == "down" &&
+              cellData?.letterPositionDown != undefined &&
+              cellData?.letterPositionDown > 0
+            ) {
+              dispatch({
+                type: "SET_LETTER_FOCUS",
+                payload: {
+                  x: cellData?.position?.x || 0,
+                  y: cellData?.position?.y - 1 || 0,
                 },
               });
             }
@@ -330,20 +384,6 @@ export const Cell: React.FC<CellProps> = ({
       </CellWrapper>
     );
   }
-
-  const resolveFocusDirection = (cellData: CrosswordCell) => {
-    if(cellData?.isFocusedDirection) {
-      if(cellData?.wordLengthAcross && cellData?.wordLengthDown) {
-        //return the opposite direction
-        return cellData?.isFocusedDirection == "across" ? "down" : "across";
-      } else {
-        //return the only direction
-        return cellData?.isFocusedDirection;
-      }
-    } else {
-      return undefined;
-    }
-  }
   return (
     <CellWrapper
       isFocusedDirectionColor={
@@ -363,7 +403,6 @@ export const Cell: React.FC<CellProps> = ({
               payload: {
                 x: cellData?.position?.x || 0,
                 y: cellData?.position?.y || 0,
-                direction: resolveFocusDirection(cellData) || (cellData?.letterPositionAcross) ? "across" : "down"
               },
             });
             dispatch({
@@ -379,7 +418,7 @@ export const Cell: React.FC<CellProps> = ({
         {cellData.rootCell && (
           <CellNumber>{cellData.rootCellQuestionNumber}</CellNumber>
         )}
-        {enteredLetter}
+        {cellData?.letter || ""}
       </CellContent>
     </CellWrapper>
   );
