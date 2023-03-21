@@ -20,6 +20,7 @@ import { GRID_SIZE } from "./api/hello";
 import ClueList from "@/components/ClueList";
 import { useScroll, useSpring, animated } from "@react-spring/web";
 import { Scrollbars } from "react-custom-scrollbars-2";
+import { Links } from "@/components/Links";
 
 const chains = [arbitrum, mainnet, polygon];
 const projectId = "9267b6388ea54a987c770a45e9b61301";
@@ -106,7 +107,7 @@ export default function Home() {
               </animated.p>
             </div>
             <div className={styles.linksSection}>
-              <a href="test">test</a>
+              <Links />
             </div>
           </main>
         </Scrollbars>

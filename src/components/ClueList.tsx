@@ -75,7 +75,7 @@ const CloseWrapper = styled.div`
   &:hover {
     svg {
       background-color: rgba(0, 0, 0, 0.1);
-      color: red;
+      color: rgb(215, 98, 33);
     }
   }
 `;

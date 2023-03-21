@@ -52,7 +52,7 @@ const InfoWrapper = styled.div`
   &:hover {
     svg {
       background-color: rgba(0, 0, 0, 0.1);
-      color: green;
+      color: #8a6d8f;
     }
   }
 `;
