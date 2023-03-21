@@ -28,9 +28,10 @@ interface CrosswordProps {
 }
 
 const CrosswordWrapper = styled.div<{ size: number }>`
-  width: 800px;
-  height: 800px;
-  max-width: 100vw;
+width: 80vw;
+height: 80vw;
+max-width: 800px;
+max-height: 800px;
 `;
 
 export const Crossword: React.FC<CrosswordProps> = ({ size }) => {
@@ -90,10 +91,10 @@ const CellWrapper = styled.div<{
 
 const CellNumber = styled.span`
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: clamp(3px, 1vw, 8px);
+  left: clamp(3px, 1vw, 8px);
   color: black;
-  font-size: 1.4rem;
+  font-size: clamp(0.8rem, 1.4vw, 1.4rem);
   font-weight: bold;
 `;
 
@@ -124,7 +125,7 @@ const CellContent = styled.div<{ isBlack: boolean }>`
   justify-content: center;
   align-items: center;
   color: black;
-  font-size: 6rem;
+  font-size: clamp(2rem, 6vw, 6rem);
 
   &:focus {
     background: #292a2e;
