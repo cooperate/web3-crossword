@@ -292,8 +292,12 @@ export function crosswordReducer(
             ...crosswordWord,
             isFocused: true,
           };
+        } else {
+            return {
+                ...crosswordWord,
+                isFocused: false,
+            };
         }
-        return crosswordWord;
       });
       //set all matching cells to word isFocused
       const newGrid = crossword.grid.map((row, rowIndex) => {
