@@ -15,6 +15,7 @@ import { Crossword, Cell } from "../components/Crossword";
 import { useContext } from "react";
 import { CrosswordContext } from "./api/CrosswordContext";
 import { CrosswordProvider } from "@/components/CrosswordProvider";
+import ClueCard from "@/components/Clue";
 
 const chains = [arbitrum, mainnet, polygon];
 const projectId = "9267b6388ea54a987c770a45e9b61301";
@@ -47,10 +48,13 @@ export default function Home() {
       </Head>
       <WagmiConfig client={wagmiClient}>
         <main className={`${styles.main} ${spaceMono.className}`}>
-          <CrosswordProvider>
-            <Crossword size={size} />
+          <div className={styles.gameSection}>
+            <CrosswordProvider>
+              <Crossword size={size} />
+              <ClueCard />
             </CrosswordProvider>
-          <Web3Button />
+            <Web3Button />
+          </div>
         </main>
       </WagmiConfig>
 

@@ -27,8 +27,8 @@ interface CrosswordProps {
 }
 
 const CrosswordWrapper = styled.div<{ size: number }>`
-  width: 1000px;
-  height: 1000px;
+  width: 800px;
+  height: 800px;
   max-width: 100vw;
 `;
 
@@ -196,6 +196,14 @@ export const Cell: React.FC<CellProps> = ({
                   y: cellData?.position?.y - 1 || 0,
                 },
               });
+              dispatch({
+                type: "SET_FOCUS_WORD",
+                payload: {
+                  x: cellData?.position?.x || 0,
+                  y: cellData?.position?.y - 1 || 0,
+                  direction: "down"
+                },
+              });
             }
             break;
           case "ArrowDown":
@@ -205,6 +213,14 @@ export const Cell: React.FC<CellProps> = ({
                 payload: {
                   x: cellData?.position?.x || 0,
                   y: cellData?.position?.y + 1 || 0,
+                },
+              });
+              dispatch({
+                type: "SET_FOCUS_WORD",
+                payload: {
+                  x: cellData?.position?.x || 0,
+                  y: cellData?.position?.y + 1 || 0,
+                  direction: "down"
                 },
               });
             }
@@ -218,6 +234,14 @@ export const Cell: React.FC<CellProps> = ({
                   y: cellData?.position?.y || 0,
                 },
               });
+              dispatch({
+                type: "SET_FOCUS_WORD",
+                payload: {
+                  x: cellData?.position?.x - 1 || 0,
+                  y: cellData?.position?.y || 0,
+                  direction: "across"
+                },
+              });
             }
             break;
           case "ArrowRight":
@@ -227,6 +251,14 @@ export const Cell: React.FC<CellProps> = ({
                 payload: {
                   x: cellData?.position?.x + 1 || 0,
                   y: cellData?.position?.y || 0,
+                },
+              });
+              dispatch({
+                type: "SET_FOCUS_WORD",
+                payload: {
+                  x: cellData?.position?.x + 1 || 0,
+                  y: cellData?.position?.y || 0,
+                  direction: "across"
                 },
               });
             }
@@ -299,6 +331,19 @@ export const Cell: React.FC<CellProps> = ({
     );
   }
 
+  const resolveFocusDirection = (cellData: CrosswordCell) => {
+    if(cellData?.isFocusedDirection) {
+      if(cellData?.wordLengthAcross && cellData?.wordLengthDown) {
+        //return the opposite direction
+        return cellData?.isFocusedDirection == "across" ? "down" : "across";
+      } else {
+        //return the only direction
+        return cellData?.isFocusedDirection;
+      }
+    } else {
+      return undefined;
+    }
+  }
   return (
     <CellWrapper
       isFocusedDirectionColor={
@@ -318,6 +363,7 @@ export const Cell: React.FC<CellProps> = ({
               payload: {
                 x: cellData?.position?.x || 0,
                 y: cellData?.position?.y || 0,
+                direction: resolveFocusDirection(cellData) || (cellData?.letterPositionAcross) ? "across" : "down"
               },
             });
             dispatch({

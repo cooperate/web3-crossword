@@ -34,6 +34,8 @@ export interface CrosswordCell {
   wordLengthDown?: number;
 }
 export interface CrosswordWord {
+  questionNumber: number;
+  clueText: string;
   letterPositions: Position[];
   direction: 'across' | 'down';
   isFocused?: boolean;

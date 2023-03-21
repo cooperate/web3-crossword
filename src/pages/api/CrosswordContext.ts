@@ -16,6 +16,8 @@ export function generateGrid(questions: CrosswordQuestion[], size: number) {
     questions.forEach((question, questionIndex) => {
         const { startX, startY } = question;
         crosswordWords[questionIndex] = {
+            questionNumber: question.questionNumber,
+            clueText: question.question,
             direction: question.direction,
             letterPositions: [],
         };
@@ -154,34 +156,22 @@ export function crosswordReducer(
             };
         }
         case "SET_FOCUS_WORD": {
-            const { x, y } = action.payload;
-            const newCrosswordWords = crossword.crosswordWords.filter((word) => {
-                return word.letterPositions.some(
-                    (position) => position.x === x && position.y === y
-                );
-            });
-            let noWordsFlipped = true;
-            //flip focus
-            const newWords = crossword.crosswordWords.reduce((acc, word) => {
-                //if word is in newCrosswordWords, flip focus
-                if (newCrosswordWords.some((newWord) => newWord === word) && noWordsFlipped) {
-                    if (!word.isFocused) {
-                        noWordsFlipped = false;
-                    }
-                    return [
-                        ...acc,
-                        {
+            const { x, y, direction } = action.payload;
+            //find word based on direction and position
+            const newWords = crossword.crosswordWords.map((word) => {
+                if (word.direction === direction) {
+                    if (word.letterPositions.some((position) => position.x === x && position.y === y)) {
+                        return {
                             ...word,
-                            isFocused: !word.isFocused,
-                        },
-                    ];
-                } else {
-                    return [...acc, {
-                        ...word,
-                        isFocused: false,
-                    }];
+                            isFocused: true,
+                        };
+                    }
                 }
-            }, [] as CrosswordWord[]);
+                return {
+                    ...word,
+                    isFocused: false,
+                };
+            });
             //find focused word
             const focusedWord = newWords.find((word) => word.isFocused);
             //if focused word, iterate over position for cells
