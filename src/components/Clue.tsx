@@ -1,9 +1,9 @@
 // components/ClueCard.tsx
 import React, { useContext, useEffect } from "react";
 import styled from "@emotion/styled";
-import { CrosswordContext } from "@/pages/api/CrosswordContext";
+import { CrosswordContext, CrosswordDispatchContext } from "@/pages/api/CrosswordContext";
 import { useSpring, animated } from "@react-spring/web";
-
+import { BsInfoSquare } from "react-icons/bs";
 interface ClueCardProps {
   clueId: number;
   direction: "Across" | "Down";
@@ -38,9 +38,28 @@ const ClueContent = styled.p`
   text-align: center;
 `;
 
+const InfoWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.5rem;
+  cursor: pointer;
+  &:hover {
+    svg {
+      background-color: rgba(0, 0, 0, 0.1);
+      color: green;
+    }
+  }
+`;
+
 const ClueCard: React.FC = () => {
   const [prevClueText, setPrevClueText] = React.useState<string | undefined>(undefined);
-  const { crosswordWords } = useContext(CrosswordContext);
+  const { crosswordWords, appState } = useContext(CrosswordContext);
+  const dispatch = useContext(CrosswordDispatchContext);
   //get focused word
   const focusedWord = crosswordWords.find((word) => word.isFocused);
   const [springProps, setSpringProps] = useSpring(() => ({
@@ -56,15 +75,20 @@ const ClueCard: React.FC = () => {
     }
     setPrevClueText(focusedWord?.clueText);
   }, [focusedWord, setSpringProps]);
-
+  const showClueList = () => {
+    dispatch({ type: "SET_SHOW_CLUE_LIST", payload: true })
+  }
   return (
     <>
-      {focusedWord && (
+      {(focusedWord && !appState?.showClueList) && (
         <CardContainer style={springProps}>
           <ClueTitle>
             {focusedWord?.questionNumber} ({focusedWord?.direction})
           </ClueTitle>
           <ClueContent>{focusedWord?.clueText}</ClueContent>
+          <InfoWrapper onClick={showClueList}>
+            <BsInfoSquare />
+          </InfoWrapper>
         </CardContainer>
       )}
     </>

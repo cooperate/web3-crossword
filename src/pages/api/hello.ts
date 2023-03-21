@@ -30,6 +30,7 @@ export interface CrosswordCell {
   isFocused?: boolean;
   isFocusedDirection?: 'across' | 'down';
   isFocusedLetter?: boolean;
+  isHovering?: boolean;
   letterPositionAcross?: number;
   letterPositionDown?: number;
   wordLengthAcross?: number;
@@ -41,6 +42,7 @@ export interface CrosswordWord {
   letterPositions: Position[];
   direction: 'across' | 'down';
   isFocused?: boolean;
+  isHovering?: boolean;
 }
 
 export default function handler(

@@ -17,6 +17,7 @@ import { CrosswordContext } from "./api/CrosswordContext";
 import { CrosswordProvider } from "@/components/CrosswordProvider";
 import ClueCard from "@/components/Clue";
 import { GRID_SIZE } from "./api/hello";
+import ClueList from "@/components/ClueList";
 
 const chains = [arbitrum, mainnet, polygon];
 const projectId = "9267b6388ea54a987c770a45e9b61301";
@@ -52,6 +53,7 @@ export default function Home() {
           <div className={styles.gameSection}>
             <CrosswordProvider>
               <Crossword size={size} />
+              <ClueList />
               <ClueCard />
             </CrosswordProvider>
             <Web3Button />

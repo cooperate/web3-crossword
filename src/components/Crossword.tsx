@@ -14,6 +14,7 @@ import {
   CrosswordDispatchContext,
 } from "@/pages/api/CrosswordContext";
 import styles from "@/styles/Crossword.module.css";
+import { animated, useSpring } from "@react-spring/web";
 
 const Grid = styled.div<{ size: number }>`
   display: grid;
@@ -48,6 +49,8 @@ export const Crossword: React.FC<CrosswordProps> = ({ size }) => {
 const CellWrapper = styled.div<{
   isFocused: boolean;
   isFocusedDirectionColor: string;
+  isHovering: boolean;
+  isHoveringColor: string;
 }>`
   position: relative;
   background: ${(props) => (props.isFocused ? "none" : "transparent")};
@@ -61,26 +64,26 @@ const CellWrapper = styled.div<{
     right: 0;
     bottom: 0;
     z-index: -1;
-    opacity: ${(props) => (props.isFocused ? 1 : 0)};
+    opacity: ${(props) => (props.isHovering ? 1 : props.isFocused ? 1 : 0)};
     transition: opacity 0.3s;
   }
 
   &::before {
-    background-color: ${(props) => props.isFocusedDirectionColor};
-    box-shadow: 0 0 5px ${(props) => props.isFocusedDirectionColor},
-      0 0 10px ${(props) => props.isFocusedDirectionColor},
-      0 0 20px ${(props) => props.isFocusedDirectionColor},
-      0 0 30px ${(props) => props.isFocusedDirectionColor},
-      0 0 40px ${(props) => props.isFocusedDirectionColor};
+    background-color: ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor};
+    box-shadow: 0 0 5px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor},
+      0 0 10px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor},
+      0 0 20px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor},
+      0 0 30px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor},
+      0 0 40px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor};
   }
 
   &::after {
-    background-color: ${(props) => props.isFocusedDirectionColor};
-    box-shadow: 0 0 5px ${(props) => props.isFocusedDirectionColor},
-      0 0 10px ${(props) => props.isFocusedDirectionColor},
-      0 0 20px ${(props) => props.isFocusedDirectionColor},
-      0 0 30px ${(props) => props.isFocusedDirectionColor},
-      0 0 40px ${(props) => props.isFocusedDirectionColor};
+    background-color: ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor};
+    box-shadow: 0 0 5px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor},
+      0 0 10px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor},
+      0 0 20px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor},
+      0 0 30px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor},
+      0 0 40px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor};
     transform: scale(1.05);
   }
 `;
@@ -317,6 +320,15 @@ export const Cell: React.FC<CellProps> = ({
               });
             }
             break;
+          case "Tab":
+            dispatch({
+              type: "SET_FOCUS_WORD",
+              payload: {
+                x: cellData?.position?.x || 0,
+                y: cellData?.position?.y || 0,
+              },
+            });
+            break;
         }
       }
     } else {
@@ -379,6 +391,8 @@ export const Cell: React.FC<CellProps> = ({
         className={styles.noGap}
         isFocusedDirectionColor={"yellow"}
         isFocused={false}
+        isHovering={false}
+        isHoveringColor="#cbe3cb"
       >
         <CellContent isBlack={true} />
       </CellWrapper>
@@ -389,6 +403,8 @@ export const Cell: React.FC<CellProps> = ({
       isFocusedDirectionColor={
         cellData?.isFocusedDirection == "across" ? "#ad88b4" : "#f87225"
       }
+      isHoveringColor="#cbe3cb"
+      isHovering={cellData?.isHovering || false}
       isFocused={cellData?.isFocused || false}
     >
       <CellContent
@@ -418,7 +434,7 @@ export const Cell: React.FC<CellProps> = ({
         {cellData.rootCell && (
           <CellNumber>{cellData.rootCellQuestionNumber}</CellNumber>
         )}
-        {cellData?.letter || ""}
+        <animated.span>{cellData?.letter || ""}</animated.span>
       </CellContent>
     </CellWrapper>
   );
