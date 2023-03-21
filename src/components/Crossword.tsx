@@ -17,6 +17,7 @@ import styles from "@/styles/Crossword.module.css";
 import { animated, useSpring } from "@react-spring/web";
 
 const Grid = styled.div<{ size: number }>`
+  z-index: 2;
   display: grid;
   grid-template-columns: repeat(${(props) => props.size}, 1fr);
   gap: 5px;
@@ -28,10 +29,11 @@ interface CrosswordProps {
 }
 
 const CrosswordWrapper = styled.div<{ size: number }>`
-width: 80vw;
-height: 80vw;
-max-width: 800px;
-max-height: 800px;
+  width: 80vw;
+  height: 80vw;
+  max-width: 800px;
+  max-height: 800px;
+  z-index: 5;
 `;
 
 export const Crossword: React.FC<CrosswordProps> = ({ size }) => {
@@ -52,10 +54,10 @@ const CellWrapper = styled.div<{
   isFocusedDirectionColor: string;
   isHovering: boolean;
   isHoveringColor: string;
+  isClicked: boolean;
 }>`
   position: relative;
   background: ${(props) => (props.isFocused ? "none" : "transparent")};
-
   &::before,
   &::after {
     content: "";
@@ -70,22 +72,90 @@ const CellWrapper = styled.div<{
   }
 
   &::before {
-    background-color: ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor};
-    box-shadow: 0 0 5px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor},
-      0 0 10px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor},
-      0 0 20px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor},
-      0 0 30px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor},
-      0 0 40px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor};
+    ${(props) =>
+      props.isClicked
+        ? `
+        background-color: ${props.isFocusedDirectionColor};
+        box-shadow: 0 0 5px
+        ${props.isFocusedDirectionColor},
+      0 0 10px
+        ${props.isFocusedDirectionColor},
+      0 0 20px
+        ${props.isFocusedDirectionColor},
+      0 0 30px
+        ${props.isFocusedDirectionColor},
+      0 0 40px
+        ${props.isFocusedDirectionColor};
+        `
+        : `
+    background-color: ${
+      props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor
+    };
+    box-shadow: 0 0 5px
+        ${
+          props.isHovering
+            ? props.isHoveringColor
+            : props.isFocusedDirectionColor
+        },
+      0 0 10px
+        ${
+          props.isHovering
+            ? props.isHoveringColor
+            : props.isFocusedDirectionColor
+        },
+      0 0 20px
+        ${
+          props.isHovering
+            ? props.isHoveringColor
+            : props.isFocusedDirectionColor
+        },
+      0 0 30px
+        ${
+          props.isHovering
+            ? props.isHoveringColor
+            : props.isFocusedDirectionColor
+        },
+      0 0 40px
+        ${
+          props.isHovering
+            ? props.isHoveringColor
+            : props.isFocusedDirectionColor
+        };`}
   }
 
   &::after {
-    background-color: ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor};
-    box-shadow: 0 0 5px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor},
-      0 0 10px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor},
-      0 0 20px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor},
-      0 0 30px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor},
-      0 0 40px ${(props) => props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor};
+    ${(props) =>
+      props.isClicked
+        ? `
+    background-color: ${props.isFocusedDirectionColor};
+    box-shadow: 0 0 5px ${props.isFocusedDirectionColor},
+      0 0 10px ${props.isFocusedDirectionColor},
+      0 0 20px ${props.isFocusedDirectionColor},
+      0 0 30px ${props.isFocusedDirectionColor},
+      0 0 40px ${props.isFocusedDirectionColor};
     transform: scale(1.05);
+    `
+        : `
+    background-color: ${
+      props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor
+    };
+    box-shadow: 0 0 5px ${
+      props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor
+    },
+      0 0 10px ${
+        props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor
+      },
+      0 0 20px ${
+        props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor
+      },
+      0 0 30px ${
+        props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor
+      },
+      0 0 40px ${
+        props.isHovering ? props.isHoveringColor : props.isFocusedDirectionColor
+      };
+    transform: scale(1.05);
+`}
   }
 `;
 
@@ -385,7 +455,14 @@ export const Cell: React.FC<CellProps> = ({
       cellContentRef.current.focus();
     }
   }, [cellData?.isFocusedLetter]);
-
+  useEffect(() => {
+    if (cellData?.isFocused && cellData?.isHovering) {
+      setIsClicked(true);
+    } else {
+      setIsClicked(false);
+    }
+  }, [cellData?.isHovering, cellData?.isFocused]);
+  const [isClicked, setIsClicked] = useState(false);
   if (!cellData) {
     return (
       <CellWrapper
@@ -394,6 +471,7 @@ export const Cell: React.FC<CellProps> = ({
         isFocused={false}
         isHovering={false}
         isHoveringColor="#cbe3cb"
+        isClicked={isClicked}
       >
         <CellContent isBlack={true} />
       </CellWrapper>
@@ -407,6 +485,7 @@ export const Cell: React.FC<CellProps> = ({
       isHoveringColor="#cbe3cb"
       isHovering={cellData?.isHovering || false}
       isFocused={cellData?.isFocused || false}
+      isClicked={isClicked}
     >
       <CellContent
         ref={cellContentRef}

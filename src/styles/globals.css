@@ -38,6 +38,10 @@
   --callout-border-rgb: 172, 175, 176;
   --card-rgb: 180, 185, 188;
   --card-border-rgb: 131, 134, 135;
+
+  --w3m-accent-fill-color: #fff !important;
+  --w3m-accent-color: #8a6d8f !important;
+  --w3m-background-color: #8a6d8f !important;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -104,4 +108,8 @@ a {
   html {
     color-scheme: dark;
   }
+}
+
+::-webkit-scrollbar {
+  visibility: hidden;
 }
