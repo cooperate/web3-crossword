@@ -17,6 +17,7 @@ export function generateGrid(questions: CrosswordQuestion[], size: number) {
   questions.forEach((question, questionIndex) => {
     const { startX, startY } = question;
     crosswordWords[questionIndex] = {
+      id: questionIndex,
       questionNumber: question.questionNumber,
       clueText: question.question,
       direction: question.direction,
@@ -32,6 +33,7 @@ export function generateGrid(questions: CrosswordQuestion[], size: number) {
         const prevQuestionNumber = grid?.[yIndex]?.[xIndex]?.questionNumber;
         if (prevQuestionNumber) {
           grid[yIndex][xIndex] = {
+            id: yIndex + xIndex,
             //letter: question.answer[i],
             questionNumber: [...prevQuestionNumber, question.questionNumber],
             rootCell: i === 0,
@@ -57,6 +59,7 @@ export function generateGrid(questions: CrosswordQuestion[], size: number) {
         }
       } else {
         grid[yIndex][xIndex] = {
+          id: questionIndex,
           //letter: question.answer[i],
           questionNumber: [question.questionNumber],
           rootCell: i === 0,
@@ -198,19 +201,17 @@ export function crosswordReducer(
     }
     case "SET_FOCUS_WORD": {
       const { x, y } = action.payload;
-      //check if word is the same word as previous (if so, do nothing)
-      //check if word is on the same axis as previous (if so, make isFocused false on prev and true on new)
-      //any other word isFocused false
-      //get prev is focused word
+
       const prevFocusedWord = crossword.crosswordWords.find(
         (word) => word.isFocused
       );
-      //find all words with overlap of coordinates
+
       const coordinateSpaceWords = crossword.crosswordWords.filter((word) =>
         word.letterPositions.some(
           (position) => position.x === x && position.y === y
         )
       );
+
       const newWords = crossword.crosswordWords.map((word) => {
         if (
           word.letterPositions.some(
@@ -219,8 +220,7 @@ export function crosswordReducer(
         ) {
           if (
             prevFocusedWord &&
-            prevFocusedWord.clueText === word?.clueText &&
-            prevFocusedWord?.isFocused === true &&
+            prevFocusedWord.clueText === word.clueText &&
             coordinateSpaceWords.length === 1
           ) {
             return {
@@ -229,13 +229,19 @@ export function crosswordReducer(
             };
           } else if (
             prevFocusedWord &&
-            prevFocusedWord.clueText === word?.clueText &&
-            prevFocusedWord?.isFocused === true &&
+            prevFocusedWord.clueText === word.clueText &&
             coordinateSpaceWords.length > 1
           ) {
+            const isDifferentAxis =
+              prevFocusedWord.direction !== word.direction;
             return {
               ...word,
-              isFocused: false,
+              isFocused: isDifferentAxis,
+            };
+          } else if (!prevFocusedWord && coordinateSpaceWords.length > 1) {
+            return {
+              ...word,
+              isFocused: word === coordinateSpaceWords[0],
             };
           } else {
             return {
@@ -249,9 +255,9 @@ export function crosswordReducer(
           isFocused: false,
         };
       });
-      //find focused word
+
       const focusedWord = newWords.find((word) => word.isFocused);
-      //if focused word, iterate over position for cells
+
       let newGrid;
       if (focusedWord) {
         newGrid = crossword.grid.map((row, rowIndex) => {
@@ -293,31 +299,46 @@ export function crosswordReducer(
             isFocused: true,
           };
         } else {
-            return {
-                ...crosswordWord,
-                isFocused: false,
-            };
+          return {
+            ...crosswordWord,
+            isFocused: false,
+          };
         }
       });
       //set all matching cells to word isFocused
       const newGrid = crossword.grid.map((row, rowIndex) => {
         return row.map((cell, cellIndex) => {
           if (cell) {
+            //if cell is the first cell of the word, set it to isFocused
             if (
+              cellIndex === word.letterPositions[0].x &&
+              rowIndex === word.letterPositions[0].y
+            ) {
+              console.log("setting first cell to isFocused", cellIndex, rowIndex, word.letterPositions);
+              return {
+                ...cell,
+                isFocused: true,
+                isFocusedDirection: word.direction,
+                isFocusedLetter: true,
+              };
+            } else if (
               word.letterPositions.some(
                 (position: Position) =>
                   position.x === cellIndex && position.y === rowIndex
               )
             ) {
+              console.log("setting cell to isFocused", cellIndex, rowIndex,  word.letterPositions);
               return {
                 ...cell,
                 isFocused: true,
                 isFocusedDirection: word.direction,
+                isFocusedLetter: false,
               };
             } else {
               return {
                 ...cell,
                 isFocused: false,
+                isFocusedLetter: false,
               };
             }
           }

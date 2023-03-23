@@ -9,9 +9,7 @@ import { TfiClose } from "react-icons/tfi";
 import { CrosswordWord } from "@/pages/api/hello";
 
 const CardContainer = styled.div`
-  z-index: 5;
-  position: absolute;
-  bottom: 100px;
+  z-index: 10;
   width: 80%;
   background-color: white;
   border-radius: 10px;
@@ -20,6 +18,8 @@ const CardContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
+  position: relative;
+  flex-grow: 1;
 `;
 
 const ClueWrapper = styled.div<{ isFocused: boolean; direction: string }>`

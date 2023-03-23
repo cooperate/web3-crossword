@@ -21,6 +21,7 @@ import ClueList from "@/components/ClueList";
 import { useScroll, useSpring, animated } from "@react-spring/web";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import { Links } from "@/components/Links";
+import styled from "@emotion/styled";
 
 const chains = [arbitrum, mainnet, polygon];
 const projectId = "9267b6388ea54a987c770a45e9b61301";
@@ -39,6 +40,13 @@ const spaceMono = Space_Mono({
   subsets: ["latin"],
 });
 
+const CrosswordContainer = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
 export default function Home() {
   const size = GRID_SIZE;
   const { grid } = useContext(CrosswordContext);
@@ -89,13 +97,17 @@ export default function Home() {
                 transform: y.interpolate((y) => `translate3d(0, ${y}, 0)`),
               }}
             />
+            <div className={styles.header}>
+              <Web3Button />
+            </div>
             <div className={styles.gameSection}>
               <CrosswordProvider>
-                <Crossword size={size} />
-                <ClueList />
+                <CrosswordContainer>
+                  <Crossword size={size} />
+                  <ClueList />
+                </CrosswordContainer>
                 <ClueCard />
               </CrosswordProvider>
-              <Web3Button />
             </div>
             <div className={styles.aboutSection}>
               <animated.h2 style={{fontSize: "4rem"}}>This is a <span style={{color: "#8a6d8f"}}>&lt;</span>Web3<span style={{color: "#8a6d8f"}}>&gt;</span> Crossword<span style={{color: "#8a6d8f"}}>.</span></animated.h2>

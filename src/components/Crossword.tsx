@@ -28,18 +28,20 @@ interface CrosswordProps {
   size: number;
 }
 
-const CrosswordWrapper = styled.div<{ size: number }>`
+const CrosswordWrapper = styled.div`
   width: 80vw;
   height: 80vw;
   max-width: 800px;
   max-height: 800px;
   z-index: 5;
+  margin-bottom: 20px;
 `;
 
 export const Crossword: React.FC<CrosswordProps> = ({ size }) => {
   const { grid } = useContext(CrosswordContext);
+
   return (
-    <CrosswordWrapper size={size}>
+    <CrosswordWrapper>
       <Grid size={size}>
         {grid.map((row, i) =>
           row.map((cell, j) => <Cell key={`${i}-${j}`} cellData={cell} />)
@@ -451,10 +453,11 @@ export const Cell: React.FC<CellProps> = ({
   };
 
   useEffect(() => {
+    console.log("cellData?.isFocusedLetter", cellData?.isFocusedLetter);
     if (cellContentRef.current && cellData?.isFocusedLetter) {
       cellContentRef.current.focus();
     }
-  }, [cellData?.isFocusedLetter]);
+  }, [cellData]);
   useEffect(() => {
     if (cellData?.isFocused && cellData?.isHovering) {
       setIsClicked(true);
@@ -470,7 +473,7 @@ export const Cell: React.FC<CellProps> = ({
         isFocusedDirectionColor={"yellow"}
         isFocused={false}
         isHovering={false}
-        isHoveringColor="#cbe3cb"
+        isHoveringColor="#798599"
         isClicked={isClicked}
       >
         <CellContent isBlack={true} />
@@ -482,7 +485,7 @@ export const Cell: React.FC<CellProps> = ({
       isFocusedDirectionColor={
         cellData?.isFocusedDirection == "across" ? "#ad88b4" : "#f87225"
       }
-      isHoveringColor="#cbe3cb"
+      isHoveringColor="#798599"
       isHovering={cellData?.isHovering || false}
       isFocused={cellData?.isFocused || false}
       isClicked={isClicked}
