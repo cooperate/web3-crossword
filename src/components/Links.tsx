@@ -86,7 +86,6 @@ export const Links = () => {
             <animated.div key={index} style={props}>
               <Link
                 key={index}
-                alt={linkData?.[index].alt}
                 url={linkData?.[index].url}
                 Icon={linkData?.[index]?.icon}
               />
