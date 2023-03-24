@@ -147,7 +147,7 @@ export type CrosswordActionType =
 export function crosswordReducer(
   crossword: CrosswordContext,
   action: CrosswordAction
-) {
+): CrosswordContext {
   switch (action.type) {
     case "SET_LETTER": {
       const { x, y, letter } = action.payload;
@@ -258,7 +258,7 @@ export function crosswordReducer(
 
       const focusedWord = newWords.find((word) => word.isFocused);
 
-      let newGrid;
+      let newGrid = null;
       if (focusedWord) {
         newGrid = crossword.grid.map((row, rowIndex) => {
           return row.map((cell, cellIndex) => {
@@ -280,6 +280,8 @@ export function crosswordReducer(
                   isFocused: false,
                 };
               }
+            } else {
+              return cell;
             }
           });
         });
@@ -341,6 +343,8 @@ export function crosswordReducer(
                 isFocusedLetter: false,
               };
             }
+          } else {
+            return cell;
           }
         });
       });
