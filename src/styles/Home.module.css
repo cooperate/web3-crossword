@@ -4,6 +4,7 @@
   justify-content: space-between;
   align-items: center;
   margin: 0 auto;
+  background: black;
 }
 
 .initialView {
@@ -31,14 +32,19 @@
   flex: 1;
 }
 .aboutSection {
-  padding: 1rem;
-  
   margin-bottom: 100px;
+  width: 100%;
+  padding: 2rem;
+  max-width: 900px;
+}
+.aboutSection h2 {
+  font-size: clamp(3.2rem, 1.5vw, 4rem);
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
 .aboutSection p {
-  font-size: 1.2rem;
+  font-size: clamp(1.3rem, 1.5vw, 2rem);
   line-height: 1.5;
-  max-width: 80ch;
   margin: 0 auto;
 }
 .description {
@@ -46,8 +52,6 @@
   justify-content: inherit;
   align-items: inherit;
   font-size: 0.85rem;
-  max-width: var(--max-width);
-  width: 100%;
   z-index: 2;
   font-family: var(--font-mono);
 }

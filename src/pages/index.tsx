@@ -23,6 +23,7 @@ import { Scrollbars } from "react-custom-scrollbars-2";
 import { Links } from "@/components/Links";
 import styled from "@emotion/styled";
 import { Header } from "@/components/Header";
+import { SubmitCrossword } from "@/components/SubmitCrossword";
 
 const chains = [arbitrum, mainnet, polygon];
 const projectId = "9267b6388ea54a987c770a45e9b61301";
@@ -109,12 +110,13 @@ export default function Home() {
                     <ClueList />
                   </CrosswordContainer>
                   <ClueCard />
+                  {/* <SubmitCrossword /> */}
                 </CrosswordProvider>
               </div>
             </div>
             <div className={styles.aboutSection}>
-              <animated.h2 style={{fontSize: "4rem"}}>This is a <span style={{color: "#8a6d8f"}}>&lt;</span>Web3<span style={{color: "#8a6d8f"}}>&gt;</span> Crossword<span style={{color: "#8a6d8f"}}>.</span></animated.h2>
-              <animated.p style={{textAlign: "left", margin: 0}}>
+              <animated.h2>This is a <span style={{color: "#8a6d8f"}}>&lt;</span>Web3<span style={{color: "#8a6d8f"}}>&gt;</span> Crossword<span style={{color: "#8a6d8f"}}>.</span></animated.h2>
+              <animated.p>
                 Fill out this weekly crossword. If you&apos;re feeling confident, you
                 may submit your results. The first person to submit a 100%
                 correct puzzle receives the weekly prize! Take your time and

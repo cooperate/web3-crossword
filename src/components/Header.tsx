@@ -7,6 +7,9 @@ const Container = styled.div`
   justify-content: space-around;
   align-items: center;
   width: 100%;
+  flex-wrap: wrap;
+  max-width: 900px;
+  gap: 16px;
 `;
 
 const ENSName = styled.div`

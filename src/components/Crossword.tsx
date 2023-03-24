@@ -272,6 +272,7 @@ export const Cell: React.FC<CellProps> = ({
               cellData?.position?.y !== 0 &&
               cellData?.letterPositionDown != undefined &&
               cellData?.wordLengthDown != undefined
+              && cellData?.letterPositionDown > 0
             ) {
               dispatch({
                 type: "SET_LETTER_FOCUS",
