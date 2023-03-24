@@ -28,10 +28,13 @@ interface ClueCardProps {
 }
 
 const CardContainer = styled(animated.div)`
-  position: absolute;
-  bottom: 100px;
-  width: 500px;
+  display: flex;
+  margin-top: 2rem;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   max-width: 80%;
+  width: 500px;
   z-index: 10;
   color: black;
   display: flex;
@@ -139,7 +142,6 @@ const PayForHint = ({
       <PayForHintButton onClick={handlePayForHint}>
         Pay for a hint.
       </PayForHintButton>
-      <div>{status}</div>
       {isLoading && <div>Loading...</div>}
       {isSuccess && <div>Transaction succeeded with hash: {data?.hash}</div>}
       {/* {errorMessage && <div>{errorMessage}</div>}
