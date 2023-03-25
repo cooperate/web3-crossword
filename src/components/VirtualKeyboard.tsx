@@ -49,8 +49,9 @@ const Key = styled.button`
     background-color: #999999;
   }
 `;
+type CustomKey = { label: string; action: string };
 
-const keysLayout: (string | { label: string; action: string })[][] = [
+const keysLayout: (string | CustomKey)[][] = [
   ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
   ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
   ["z", "x", "c", "v", "b", "n", "m", { label: "⌫", action: "backspace" }],
@@ -59,15 +60,15 @@ const keysLayout: (string | { label: string; action: string })[][] = [
 const VirtualKeyboard: React.FC = () => {
   const { grid } = useContext(CrosswordContext);
   const dispatch = useContext(CrosswordDispatchContext);
-  const handleKeyPress = (key: string) => {
+  const handleKeyPress = (key: string | CustomKey) => {
     let cellData;
     for (let row of grid) {
-      cellData = row.find(cell => cell?.isFocusedLetter);
+      cellData = row.find((cell) => cell?.isFocusedLetter);
       if (cellData) {
         break;
       }
     }
-    if (key == "Backspace") {
+    if (typeof key !== "string" && key?.action == "backspace") {
       dispatch({
         type: "SET_LETTER",
         payload: {
@@ -89,6 +90,18 @@ const VirtualKeyboard: React.FC = () => {
           },
         });
       } else if (
+        cellData?.isFocusedDirection == "across" &&
+        cellData?.letterPositionAcross != undefined &&
+        cellData?.letterPositionAcross == 0
+      ) {
+        dispatch({
+          type: "SET_LETTER_FOCUS",
+          payload: {
+            x: cellData?.position?.x || 0,
+            y: cellData?.position?.y || 0,
+          },
+        });
+      } else if (
         cellData?.isFocusedDirection == "down" &&
         cellData?.letterPositionDown != undefined &&
         cellData?.letterPositionDown > 0
@@ -100,8 +113,20 @@ const VirtualKeyboard: React.FC = () => {
             y: cellData?.position?.y - 1 || 0,
           },
         });
+      } else if (
+        cellData?.isFocusedDirection == "down" &&
+        cellData?.letterPositionDown != undefined &&
+        cellData?.letterPositionDown == 0
+      ) {
+        dispatch({
+          type: "SET_LETTER_FOCUS",
+          payload: {
+            x: cellData?.position?.x || 0,
+            y: cellData?.position?.y || 0,
+          },
+        });
       }
-    } else {
+    } else if (typeof key == "string") {
       key = key.toUpperCase();
       if (cellData) {
         console.log("entering letter for cellData", cellData);
@@ -117,7 +142,7 @@ const VirtualKeyboard: React.FC = () => {
           if (
             cellData?.letterPositionAcross != undefined &&
             cellData?.wordLengthAcross != undefined &&
-            cellData?.letterPositionAcross < cellData?.wordLengthAcross
+            cellData?.letterPositionAcross < cellData?.wordLengthAcross - 1
           ) {
             dispatch({
               type: "SET_LETTER_FOCUS",
@@ -126,18 +151,43 @@ const VirtualKeyboard: React.FC = () => {
                 y: cellData?.position?.y || 0,
               },
             });
+          } else if (
+            cellData?.letterPositionAcross != undefined &&
+            cellData?.wordLengthAcross != undefined &&
+            cellData?.letterPositionAcross === cellData?.wordLengthAcross - 1
+          ) {
+            console.log("setting focus to same cell", cellData);
+            dispatch({
+              type: "SET_LETTER_FOCUS",
+              payload: {
+                x: cellData?.position?.x || 0,
+                y: cellData?.position?.y || 0,
+              },
+            });
           }
         } else if (cellData?.isFocusedDirection == "down") {
           if (
             cellData?.letterPositionDown != undefined &&
             cellData?.wordLengthDown != undefined &&
-            cellData?.letterPositionDown < cellData?.wordLengthDown
+            cellData?.letterPositionDown < cellData?.wordLengthDown - 1
           ) {
             dispatch({
               type: "SET_LETTER_FOCUS",
               payload: {
                 x: cellData?.position?.x || 0,
                 y: cellData?.position?.y + 1 || 0,
+              },
+            });
+          } else if (
+            cellData?.letterPositionDown != undefined &&
+            cellData?.wordLengthDown != undefined &&
+            cellData?.letterPositionDown === cellData?.wordLengthDown - 1
+          ) {
+            dispatch({
+              type: "SET_LETTER_FOCUS",
+              payload: {
+                x: cellData?.position?.x || 0,
+                y: cellData?.position?.y || 0,
               },
             });
           }

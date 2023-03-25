@@ -56,6 +56,7 @@ const CardContainer = styled(animated.div)`
 
 const ClueTitle = styled.h4`
   margin: 0;
+  margin-top: 0.1rem;
   font-size: 1rem;
   font-weight: bold;
 `;
@@ -85,12 +86,13 @@ const InfoWrapper = styled.div`
 `;
 
 const HelpText = styled.span`
-  font-size: 0.8rem;
+  font-size: clamp(1rem, 1vw, 1.2rem)
   color: #8a6d8f;
   cursor: pointer;
   &:hover {
     text-decoration: underline;
   }
+  margin: 0.1rem;
 `;
 
 const PayForHintButton = styled.button`
@@ -133,7 +135,6 @@ const PayForHint = ({
   });
 
   const handlePayForHint = () => {
-    console.log('handlePayForHint', sendTransaction);
     if (sendTransaction) {
       sendTransaction();
     }

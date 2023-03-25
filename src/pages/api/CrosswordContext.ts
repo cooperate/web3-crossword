@@ -174,7 +174,6 @@ export function crosswordReducer(
     }
     case "SET_LETTER_FOCUS": {
       const { x, y } = action.payload;
-      console.log("set letter focus", x, y);
       //reset all other cells focus
       const newGrid = crossword.grid.map((row, rowIndex) => {
         return row.map((cell, cellIndex) => {
@@ -316,7 +315,6 @@ export function crosswordReducer(
               cellIndex === word.letterPositions[0].x &&
               rowIndex === word.letterPositions[0].y
             ) {
-              console.log("setting first cell to isFocused", cellIndex, rowIndex, word.letterPositions);
               return {
                 ...cell,
                 isFocused: true,
@@ -329,7 +327,6 @@ export function crosswordReducer(
                   position.x === cellIndex && position.y === rowIndex
               )
             ) {
-              console.log("setting cell to isFocused", cellIndex, rowIndex,  word.letterPositions);
               return {
                 ...cell,
                 isFocused: true,
