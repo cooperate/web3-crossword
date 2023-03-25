@@ -20,6 +20,8 @@ import { ethers } from "ethers";
 import { PAY_ADDRESS } from "@/pages/api/hello";
 import { useDebounce } from "use-debounce";
 import { parseEther } from "ethers/lib/utils.js";
+import VirtualKeyboard from "./VirtualKeyboard";
+import { isMobile } from "@/utils";
 
 interface ClueCardProps {
   clueId: number;
@@ -45,6 +47,11 @@ const CardContainer = styled(animated.div)`
   padding: 1rem;
   border-radius: 1rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
+
+  @media (max-width: 900px) {
+    max-width: 100%;
+    padding: 0;
+  }
 `;
 
 const ClueTitle = styled.h4`
@@ -187,9 +194,15 @@ const NeedHelp = () => {
 };
 
 const ClueCard: React.FC = () => {
-  const [prevClueText, setPrevClueText] = React.useState<string | undefined>(
+  const [prevClueText, setPrevClueText] = useState<string | undefined>(
     undefined
   );
+  const [displayKeyboard, setDisplayKeyboard] = useState(false);
+
+  useEffect(() => {
+    setDisplayKeyboard(isMobile());
+  }, []);
+
   const { crosswordWords, appState } = useContext(CrosswordContext);
   const dispatch = useContext(CrosswordDispatchContext);
   //get focused word
@@ -218,6 +231,7 @@ const ClueCard: React.FC = () => {
             {focusedWord?.questionNumber} ({focusedWord?.direction})
           </ClueTitle>
           <ClueContent>{focusedWord?.clueText}</ClueContent>
+          <VirtualKeyboard />
           <NeedHelp />
           <InfoWrapper onClick={showClueList}>
             <BsInfoSquare />
