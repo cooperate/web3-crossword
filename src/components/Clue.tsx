@@ -55,6 +55,9 @@ const CardContainer = styled(animated.div)`
 `;
 
 const ClueTitle = styled.h4`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin: 0;
   margin-top: 0.1rem;
   font-size: 1rem;
@@ -108,6 +111,15 @@ const PayForHintButton = styled.button`
   }
 `;
 
+const ChangeWord = styled.span`
+  font-size: 2rem;
+  color: #8a6d8f;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+  margin: 0 2rem;
+`;
 const PayForHint = ({
   paymentWalletAddress,
   displayHint
@@ -236,9 +248,9 @@ const ClueCard: React.FC = () => {
       {focusedWord && !appState?.showClueList && (
         <CardContainer style={springProps}>
           <ClueTitle>
-            <span onClick={() => handleSelectWord('next')}>&lt;</span>
+            <ChangeWord onClick={() => handleSelectWord('next')}>&lt;</ChangeWord>
             {focusedWord?.questionNumber} ({focusedWord?.direction})
-            <span onClick={() => handleSelectWord('previous')}>&gt;</span>
+            <ChangeWord onClick={() => handleSelectWord('previous')}>&gt;</ChangeWord>
           </ClueTitle>
           <ClueContent>{focusedWord?.clueText}</ClueContent>
           <VirtualKeyboard />

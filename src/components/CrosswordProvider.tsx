@@ -7,6 +7,8 @@ const { grid, crosswordWords }: { grid: (CrosswordCell | null)[][], crosswordWor
 export const CrosswordProvider = ({ children }: { children: React.ReactNode }) => {
     const [crossword, dispatch] = useReducer(crosswordReducer, { grid, crosswordWords, appState: {
         showClueList: false,
+        selectedWord: null,
+        selectedCell: null,
       } });
 
     return (

@@ -317,7 +317,8 @@ export const Cell: React.FC<CellProps> = ({
             if (
               cellData?.position?.x !== 0 &&
               cellData?.letterPositionAcross != undefined &&
-              cellData?.wordLengthAcross != undefined
+              cellData?.wordLengthAcross != undefined &&
+              cellData?.letterPositionAcross > 0
             ) {
               dispatch({
                 type: "SET_LETTER_FOCUS",
@@ -333,7 +334,7 @@ export const Cell: React.FC<CellProps> = ({
                   y: cellData?.position?.y || 0,
                 },
               });
-            }
+            } 
             break;
           case "ArrowRight":
             if (

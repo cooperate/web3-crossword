@@ -211,7 +211,9 @@ export function crosswordReducer(
     }
     case "SET_FOCUS_WORD": {
       const { x, y } = action.payload;
-
+      const appState = {
+        ...crossword.appState
+      };
       const prevFocusedWord = crossword.crosswordWords.find(
         (word) => word.isFocused
       );
@@ -233,10 +235,12 @@ export function crosswordReducer(
             prevFocusedWord.clueText === word.clueText &&
             coordinateSpaceWords.length === 1
           ) {
-            return {
+            const newWord = {
               ...word,
               isFocused: true,
             };
+            appState.selectedWord = newWord;
+            return newWord;
           } else if (
             prevFocusedWord &&
             prevFocusedWord.clueText === word.clueText &&
@@ -244,20 +248,30 @@ export function crosswordReducer(
           ) {
             const isDifferentAxis =
               prevFocusedWord.direction !== word.direction;
-            return {
+            const newWord = {
               ...word,
               isFocused: isDifferentAxis,
             };
+            if(isDifferentAxis) {
+              appState.selectedWord = newWord;
+            }
+            return newWord;
           } else if (!prevFocusedWord && coordinateSpaceWords.length > 1) {
-            return {
+            const newWord = {
               ...word,
               isFocused: word === coordinateSpaceWords[0],
             };
+            if(word === coordinateSpaceWords[0]) {
+              appState.selectedWord = newWord;
+            }
+            return newWord;
           } else {
-            return {
+            const newWord = {
               ...word,
               isFocused: true,
             };
+            appState.selectedWord = newWord;
+            return newWord;
           }
         }
         return {
@@ -279,11 +293,13 @@ export function crosswordReducer(
                     position.x === cellIndex && position.y === rowIndex
                 )
               ) {
-                return {
+                const newCell = {
                   ...cell,
                   isFocused: true,
                   isFocusedDirection: focusedWord.direction,
                 };
+                appState.selectedCell = newCell;
+                return newCell;
               } else {
                 return {
                   ...cell,
@@ -298,12 +314,18 @@ export function crosswordReducer(
       }
       return {
         ...crossword,
+        appState,
         grid: newGrid ? newGrid : crossword.grid,
         crosswordWords: newWords,
       };
     }
     case "SET_FOCUS_WORD_BY_WORD": {
       const word = action.payload;
+      //set appState matching word
+      const appState = {
+        ...crossword.appState,
+        selectedWord: word,
+      };
       const newWords = crossword.crosswordWords.map((crosswordWord) => {
         if (crosswordWord.clueText === word.clueText) {
           return {
@@ -326,24 +348,28 @@ export function crosswordReducer(
               cellIndex === word.letterPositions[0].x &&
               rowIndex === word.letterPositions[0].y
             ) {
-              return {
+              const newCell = {
                 ...cell,
                 isFocused: true,
                 isFocusedDirection: word.direction,
-                isFocusedLetter: true,
-              };
+                isFocusedLetter: false,
+              }
+              appState.selectedCell = newCell; 
+              return newCell;
             } else if (
               word.letterPositions.some(
                 (position: Position) =>
                   position.x === cellIndex && position.y === rowIndex
               )
             ) {
-              return {
+              const newCell = {
                 ...cell,
                 isFocused: true,
                 isFocusedDirection: word.direction,
                 isFocusedLetter: false,
-              };
+              }
+              appState.selectedCell = newCell; 
+              return newCell;
             } else {
               return {
                 ...cell,
@@ -358,6 +384,7 @@ export function crosswordReducer(
       });
       return {
         ...crossword,
+        appState,
         grid: newGrid,
         crosswordWords: newWords,
       };
