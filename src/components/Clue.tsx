@@ -17,7 +17,7 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { ethers } from "ethers";
-import { PAY_ADDRESS } from "@/pages/api/hello";
+import { PAY_ADDRESS, WordDirection } from "@/pages/api/hello";
 import { useDebounce } from "use-debounce";
 import { parseEther } from "ethers/lib/utils.js";
 import VirtualKeyboard from "./VirtualKeyboard";
@@ -224,12 +224,21 @@ const ClueCard: React.FC = () => {
   const showClueList = () => {
     dispatch({ type: "SET_SHOW_CLUE_LIST", payload: true });
   };
+  const handleSelectWord = (wordDirection: WordDirection) => {
+    if(wordDirection === 'next') {
+      dispatch({ type: "SELECT_NEXT_WORD" });
+    } else {
+      dispatch({ type: "SELECT_PREVIOUS_WORD" });
+    }
+  };
   return (
     <>
       {focusedWord && !appState?.showClueList && (
         <CardContainer style={springProps}>
           <ClueTitle>
+            <span onClick={() => handleSelectWord('next')}>&lt;</span>
             {focusedWord?.questionNumber} ({focusedWord?.direction})
+            <span onClick={() => handleSelectWord('previous')}>&gt;</span>
           </ClueTitle>
           <ClueContent>{focusedWord?.clueText}</ClueContent>
           <VirtualKeyboard />

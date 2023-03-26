@@ -47,6 +47,8 @@ export interface CrosswordWord {
   isHovering?: boolean;
 }
 
+export type WordDirection = 'next' | 'previous';
+
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>

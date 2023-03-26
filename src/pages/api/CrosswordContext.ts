@@ -111,6 +111,8 @@ const {
 
 type AppState = {
   showClueList: boolean;
+  selectedWord: CrosswordWord | null;
+  selectedCell: CrosswordCell | null;
 };
 
 type CrosswordContext = {
@@ -124,6 +126,8 @@ export const CrosswordContext = createContext<CrosswordContext>({
   crosswordWords,
   appState: {
     showClueList: false,
+    selectedWord: null,
+    selectedCell: null,
   },
 });
 export const CrosswordDispatchContext = createContext<React.Dispatch<any>>(
@@ -142,12 +146,19 @@ export type CrosswordActionType =
   | "SET_SHOW_CLUE_LIST"
   | "SET_IS_HOVERING"
   | "SET_NO_HOVERING"
-  | "SET_FOCUS_WORD_BY_WORD";
+  | "SET_FOCUS_WORD_BY_WORD"
+  | "SELECT_NEXT_WORD"
+  | "SELECT_PREVIOUS_WORD";
 
 export function crosswordReducer(
   crossword: CrosswordContext,
   action: CrosswordAction
 ): CrosswordContext {
+  const currentDirection =
+    crossword.appState.selectedWord?.direction || "across";
+  const wordsInDirection = crossword.crosswordWords.filter(
+    (word) => word.direction === currentDirection
+  );
   switch (action.type) {
     case "SET_LETTER": {
       const { x, y, letter } = action.payload;
@@ -420,6 +431,108 @@ export function crosswordReducer(
         ...crossword,
         crosswordWords: newWords,
         grid: newGrid,
+      };
+    }
+    case "SELECT_NEXT_WORD": {
+      const currentIndex = wordsInDirection.findIndex(
+        (word) => word.id === crossword.appState.selectedWord?.id
+      );
+      const nextIndex = (currentIndex + 1) % wordsInDirection.length;
+      const nextWord = wordsInDirection[nextIndex];
+      const nextCell: CrosswordCell | null =
+        crossword.grid[nextWord.letterPositions[0].x][
+          nextWord.letterPositions[0].y
+        ];
+
+      const updatedGrid = crossword.grid.map((row) =>
+        row.map((cell) => {
+          if (cell) {
+            return cell && cell.id === nextCell?.id
+              ? {
+                  ...cell,
+                  isFocused: true,
+                  isFocusedDirection: nextWord.direction,
+                  isFocusedLetter: true,
+                }
+              : {
+                  ...cell,
+                  isFocused: false,
+                  isFocusedDirection: undefined,
+                  isFocusedLetter: false,
+                };
+          } else {
+            return cell;
+          }
+        })
+      );
+
+      const updatedCrosswordWords = crossword.crosswordWords.map((word) =>
+        word.id === nextWord.id
+          ? { ...word, isFocused: true }
+          : { ...word, isFocused: false }
+      );
+
+      return {
+        ...crossword,
+        grid: updatedGrid,
+        crosswordWords: updatedCrosswordWords,
+        appState: {
+          ...crossword.appState,
+          selectedWord: nextWord,
+          selectedCell: nextCell,
+        },
+      };
+    }
+
+    case "SELECT_PREVIOUS_WORD": {
+      const currentIndex = wordsInDirection.findIndex(
+        (word) => word.id === crossword.appState.selectedWord?.id
+      );
+      const prevIndex =
+        currentIndex === 0 ? wordsInDirection.length - 1 : currentIndex - 1;
+      const prevWord = wordsInDirection[prevIndex];
+      const prevCell =
+        crossword.grid[prevWord.letterPositions[0].x][
+          prevWord.letterPositions[0].y
+        ];
+
+      const updatedGrid = crossword.grid.map((row) =>
+        row.map((cell) => {
+          if (cell) {
+            return cell && cell.id === prevCell?.id
+              ? {
+                  ...cell,
+                  isFocused: true,
+                  isFocusedDirection: prevWord.direction,
+                  isFocusedLetter: true,
+                }
+              : {
+                  ...cell,
+                  isFocused: false,
+                  isFocusedDirection: undefined,
+                  isFocusedLetter: false,
+                };
+          } else {
+            return cell;
+          }
+        })
+      );
+
+      const updatedCrosswordWords = crossword.crosswordWords.map((word) =>
+        word.id === prevWord.id
+          ? { ...word, isFocused: true }
+          : { ...word, isFocused: false }
+      );
+
+      return {
+        ...crossword,
+        grid: updatedGrid,
+        crosswordWords: updatedCrosswordWords,
+        appState: {
+          ...crossword.appState,
+          selectedWord: prevWord,
+          selectedCell: prevCell,
+        },
       };
     }
     default: {

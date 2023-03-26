@@ -6,11 +6,11 @@ import {
   CrosswordDispatchContext,
 } from "@/pages/api/CrosswordContext";
 
-const KeyboardContainer = styled.div`
+const KeyboardContainer = styled.div<{direction: string}>`
   display: flex;
   flex-direction: column;
   padding: 10px;
-  background-color: #967c9a;
+  background-color: ${({ direction }) => direction == 'across' ? '#967c9a' : '#f46f23'};
   border-radius: 10px;
   max-width: 100%;
   gap: 0.2rem;
@@ -58,7 +58,7 @@ const keysLayout: (string | CustomKey)[][] = [
 ];
 
 const VirtualKeyboard: React.FC = () => {
-  const { grid } = useContext(CrosswordContext);
+  const { appState, grid } = useContext(CrosswordContext);
   const dispatch = useContext(CrosswordDispatchContext);
   const handleKeyPress = (key: string | CustomKey) => {
     let cellData;
@@ -197,7 +197,7 @@ const VirtualKeyboard: React.FC = () => {
   };
 
   return (
-    <KeyboardContainer>
+    <KeyboardContainer direction={appState?.selectedWord?.direction || 'across'}>
       {keysLayout.map((row, rowIndex) => (
         <KeyRow key={rowIndex}>
           {row.map((key: any, keyIndex) => (
