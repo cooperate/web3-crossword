@@ -109,13 +109,13 @@ const {
 }: { grid: (CrosswordCell | null)[][]; crosswordWords: CrosswordWord[] } =
   generateGrid(crosswordTestData, 7);
 
-type AppState = {
+export type AppState = {
   showClueList: boolean;
   selectedWord: CrosswordWord | null;
   selectedCell: CrosswordCell | null;
 };
 
-type CrosswordContext = {
+export type CrosswordContext = {
   grid: (CrosswordCell | null)[][];
   crosswordWords: CrosswordWord[];
   appState: AppState;
