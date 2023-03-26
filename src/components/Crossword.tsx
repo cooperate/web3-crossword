@@ -455,7 +455,7 @@ export const Cell: React.FC<CellProps> = ({
   };
 
   useEffect(() => {
-    console.log("cellData?.isFocusedLetter", cellData?.isFocusedLetter);
+    console.log("Crossword.tsx cellData?.isFocusedLetter", cellData?.isFocusedLetter);
     if (cellContentRef.current && cellData?.isFocusedLetter) {
       cellContentRef.current.focus();
     }

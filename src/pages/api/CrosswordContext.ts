@@ -13,6 +13,7 @@ export function generateGrid(questions: CrosswordQuestion[], size: number) {
   );
 
   let crosswordWords: CrosswordWord[] = [];
+  let gridId = 0;
 
   questions.forEach((question, questionIndex) => {
     const { startX, startY } = question;
@@ -33,7 +34,7 @@ export function generateGrid(questions: CrosswordQuestion[], size: number) {
         const prevQuestionNumber = grid?.[yIndex]?.[xIndex]?.questionNumber;
         if (prevQuestionNumber) {
           grid[yIndex][xIndex] = {
-            id: yIndex + xIndex,
+            id: `${yIndex}-${xIndex}`,
             //letter: question.answer[i],
             questionNumber: [...prevQuestionNumber, question.questionNumber],
             rootCell: i === 0,
@@ -56,10 +57,11 @@ export function generateGrid(questions: CrosswordQuestion[], size: number) {
                 ? question.answerLength
                 : grid[yIndex][xIndex]?.wordLengthDown,
           };
+          gridId++;
         }
       } else {
         grid[yIndex][xIndex] = {
-          id: questionIndex,
+          id: `${yIndex}-${xIndex}`,
           //letter: question.answer[i],
           questionNumber: [question.questionNumber],
           rootCell: i === 0,
@@ -213,7 +215,7 @@ export function crosswordReducer(
     case "SET_FOCUS_WORD": {
       const { x, y } = action.payload;
       const appState = {
-        ...crossword.appState
+        ...crossword.appState,
       };
       const prevFocusedWord = crossword.crosswordWords.find(
         (word) => word.isFocused
@@ -253,7 +255,7 @@ export function crosswordReducer(
               ...word,
               isFocused: isDifferentAxis,
             };
-            if(isDifferentAxis) {
+            if (isDifferentAxis) {
               appState.selectedWord = newWord;
             }
             return newWord;
@@ -262,7 +264,7 @@ export function crosswordReducer(
               ...word,
               isFocused: word === coordinateSpaceWords[0],
             };
-            if(word === coordinateSpaceWords[0]) {
+            if (word === coordinateSpaceWords[0]) {
               appState.selectedWord = newWord;
             }
             return newWord;
@@ -354,8 +356,8 @@ export function crosswordReducer(
                 isFocused: true,
                 isFocusedDirection: word.direction,
                 isFocusedLetter: false,
-              }
-              appState.selectedCell = newCell; 
+              };
+              appState.selectedCell = newCell;
               return newCell;
             } else if (
               word.letterPositions.some(
@@ -368,8 +370,8 @@ export function crosswordReducer(
                 isFocused: true,
                 isFocusedDirection: word.direction,
                 isFocusedLetter: false,
-              }
-              appState.selectedCell = newCell; 
+              };
+              appState.selectedCell = newCell;
               return newCell;
             } else {
               return {
@@ -465,16 +467,34 @@ export function crosswordReducer(
       const currentIndex = wordsInDirection.findIndex(
         (word) => word.id === crossword.appState.selectedWord?.id
       );
-      const nextIndex = (currentIndex + 1) % wordsInDirection.length;
+      const nextIndex =
+        currentIndex + 1 < wordsInDirection.length ? currentIndex + 1 : 0;
       const nextWord = wordsInDirection[nextIndex];
-      const nextCell: CrosswordCell | null =
-        crossword.grid[nextWord.letterPositions[0].x][
-          nextWord.letterPositions[0].y
-        ];
-
+      console.log("select next word", nextWord);
+      //iterate over all cells matching nextWord letterpositions and select the cell after the one that matches focusedletter, otherwise select the first cell
+      let nextCell: CrosswordCell | null = null;
+      nextWord.letterPositions.some((position) => {
+        console.log("position", position);
+        const cell = crossword.grid[position.y][position.x];
+        console.log("cell", cell?.letter);
+        if (cell?.letter == undefined || cell?.letter == "") {
+          console.log("cell is empty, assigning nextCell");
+          nextCell = cell;
+          return true;
+        }
+      });
+      if (!nextCell) {
+        nextCell =
+          crossword.grid[nextWord?.letterPositions[0].y][
+            nextWord?.letterPositions[0].x
+          ];
+      }
+      console.log("nextCell", nextCell);
       const updatedGrid = crossword.grid.map((row) =>
         row.map((cell) => {
           if (cell) {
+            console.log("cell id", cell?.id);
+            console.log("nextCell id", nextCell?.id);
             return cell && cell.id === nextCell?.id
               ? {
                   ...cell,
@@ -507,7 +527,7 @@ export function crosswordReducer(
         appState: {
           ...crossword.appState,
           selectedWord: nextWord,
-          selectedCell: nextCell,
+          selectedCell: nextCell || null,
         },
       };
     }
@@ -520,8 +540,8 @@ export function crosswordReducer(
         currentIndex === 0 ? wordsInDirection.length - 1 : currentIndex - 1;
       const prevWord = wordsInDirection[prevIndex];
       const prevCell =
-        crossword.grid[prevWord.letterPositions[0].x][
-          prevWord.letterPositions[0].y
+        crossword.grid[prevWord.letterPositions[0].y][
+          prevWord.letterPositions[0].x
         ];
 
       const updatedGrid = crossword.grid.map((row) =>

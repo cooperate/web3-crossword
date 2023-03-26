@@ -248,9 +248,9 @@ const ClueCard: React.FC = () => {
       {focusedWord && !appState?.showClueList && (
         <CardContainer style={springProps}>
           <ClueTitle>
-            <ChangeWord onClick={() => handleSelectWord('next')}>&lt;</ChangeWord>
+            <ChangeWord onClick={() => handleSelectWord('previous')}>&lt;</ChangeWord>
             {focusedWord?.questionNumber} ({focusedWord?.direction})
-            <ChangeWord onClick={() => handleSelectWord('previous')}>&gt;</ChangeWord>
+            <ChangeWord onClick={() => handleSelectWord('next')}>&gt;</ChangeWord>
           </ClueTitle>
           <ClueContent>{focusedWord?.clueText}</ClueContent>
           <VirtualKeyboard />

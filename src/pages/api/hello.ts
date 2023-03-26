@@ -22,7 +22,7 @@ export interface Position {
   y: number;
 }
 export interface CrosswordCell {
-  id: number;
+  id: string;
   letter?: string;
   questionNumber: number[];
   rootCell: boolean;
