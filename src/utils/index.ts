@@ -18,10 +18,14 @@ export function saveStateToLocalStorage(state: CrosswordContext) {
 
 export function loadStateFromLocalStorage(): CrosswordContext | undefined {
   try {
+    console.log('is window undefined', typeof window === "undefined");
+
     const serializedState = typeof window !== "undefined" ?  window.localStorage.getItem("crosswordState") : null;
     if (serializedState === null) {
-      return undefined;
+        console.log('serializedState is null');
+        return undefined;
     }
+    console.log('serializedState loaded', JSON.parse(serializedState)?.grid[0]?.[0]);
     return JSON.parse(serializedState) as CrosswordContext;
   } catch (error) {
     console.error("Error loading state from local storage:", error);

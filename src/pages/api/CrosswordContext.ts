@@ -148,7 +148,8 @@ export type CrosswordActionType =
   | "SET_NO_HOVERING"
   | "SET_FOCUS_WORD_BY_WORD"
   | "SELECT_NEXT_WORD"
-  | "SELECT_PREVIOUS_WORD";
+  | "SELECT_PREVIOUS_WORD"
+  | "LOAD_STATE";
 
 export function crosswordReducer(
   crossword: CrosswordContext,
@@ -561,6 +562,10 @@ export function crosswordReducer(
           selectedCell: prevCell,
         },
       };
+    }
+    case "LOAD_STATE": {
+      const state = action.payload;
+      return state;
     }
     default: {
       throw Error("Unknown action: " + action.type);
