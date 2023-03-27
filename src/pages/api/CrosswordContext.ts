@@ -238,12 +238,10 @@ export function crosswordReducer(
             prevFocusedWord.clueText === word.clueText &&
             coordinateSpaceWords.length === 1
           ) {
-            const newWord = {
+            return {
               ...word,
               isFocused: true,
             };
-            appState.selectedWord = newWord;
-            return newWord;
           } else if (
             prevFocusedWord &&
             prevFocusedWord.clueText === word.clueText &&
@@ -251,26 +249,20 @@ export function crosswordReducer(
           ) {
             const isDifferentAxis =
               prevFocusedWord.direction !== word.direction;
-            const newWord = {
+            return {
               ...word,
               isFocused: isDifferentAxis,
             };
-            appState.selectedWord = newWord;
-            return newWord;
           } else if (!prevFocusedWord && coordinateSpaceWords.length > 1) {
-            const newWord = {
+            return {
               ...word,
               isFocused: word === coordinateSpaceWords[0],
             };
-            appState.selectedWord = newWord;
-            return newWord;
           } else {
-            const newWord = {
+            return {
               ...word,
               isFocused: true,
             };
-            appState.selectedWord = newWord;
-            return newWord;
           }
         }
         return {
@@ -280,7 +272,7 @@ export function crosswordReducer(
       });
 
       const focusedWord = newWords.find((word) => word.isFocused);
-
+      appState.selectedWord = focusedWord || null;
       let newGrid = null;
       if (focusedWord) {
         newGrid = crossword.grid.map((row, rowIndex) => {
