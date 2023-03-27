@@ -13,10 +13,10 @@ const Container = styled.div`
 `;
 
 export const ENSName = styled.div`
-display: flex;
-justify-content: center;
-align-items: end;
-flex-direction: column;
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  flex-direction: column;
   font-size: 0.8rem;
   margin: 0.5rem 0;
   text-align: center;
@@ -27,6 +27,9 @@ flex-direction: column;
       text-decoration: underline;
     }
   }
+`;
+
+const ENSNameWrapper = styled.div`
   @media (max-width: 900px) {
     display: none;
   }
@@ -39,15 +42,19 @@ const Title = styled.h1`
 export const Header = () => (
   <Container>
     <Web3Button />
-    <Title>CROSSw<span style={{color: "#8a6d8f"}}>3</span>b</Title>
-    <ENSName>
-      <span>A website by</span>
-      <a
-        href="https://app.ens.domains/name/brettcizmar.eth/details"
-        target="_blank"
-      >
-        brettcizmar.eth
-      </a>
-    </ENSName>
+    <Title>
+      CROSSw<span style={{ color: "#8a6d8f" }}>3</span>b
+    </Title>
+    <ENSNameWrapper>
+      <ENSName>
+        <span>A website by</span>
+        <a
+          href="https://app.ens.domains/name/brettcizmar.eth/details"
+          target="_blank"
+        >
+          brettcizmar.eth
+        </a>
+      </ENSName>
+    </ENSNameWrapper>
   </Container>
 );
