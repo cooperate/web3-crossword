@@ -17,7 +17,7 @@ import {
   useWaitForTransaction,
 } from "wagmi";
 import { ethers } from "ethers";
-import { PAY_ADDRESS, WordDirection } from "@/pages/api/hello";
+import { generateMessage, PAY_ADDRESS, WordDirection } from "@/pages/api/hello";
 import { useDebounce } from "use-debounce";
 import { parseEther } from "ethers/lib/utils.js";
 import VirtualKeyboard from "./VirtualKeyboard";
@@ -122,7 +122,7 @@ const ChangeWord = styled.span`
 `;
 const PayForHint = ({
   paymentWalletAddress,
-  displayHint
+  displayHint,
 }: {
   paymentWalletAddress: string;
   displayHint: () => void;
@@ -131,16 +131,27 @@ const PayForHint = ({
   const amount = "0.003";
   const [debouncedTo] = useDebounce(to, 500);
   const [debouncedAmount] = useDebounce(amount, 500);
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined
+  );
 
-  const { config, status, error: prepareError } = usePrepareSendTransaction({
+  const {
+    config,
+    status,
+    error: prepareError,
+  } = usePrepareSendTransaction({
     request: {
       to: debouncedTo,
       value: debouncedAmount ? parseEther(debouncedAmount) : undefined,
     },
   });
 
-  const { data, sendTransaction, isError, error: sendError } = useSendTransaction(config);
+  const {
+    data,
+    sendTransaction,
+    isError,
+    error: sendError,
+  } = useSendTransaction(config);
 
   const { isLoading, isSuccess } = useWaitForTransaction({
     hash: data?.hash,
@@ -152,7 +163,7 @@ const PayForHint = ({
     }
   };
   useEffect(() => {
-    if(isSuccess) {
+    if (isSuccess) {
       displayHint();
     }
   }, [isSuccess]);
@@ -171,20 +182,15 @@ const PayForHint = ({
   );
 };
 
-const NeedHelp = () => {
+const NeedHelp = ({ displayHint }: { displayHint: () => void }) => {
   const { isOpen, open, close } = useWeb3Modal();
   const { connector, isConnected } = useAccount();
   const [walletConnectModalOpen, setWalletConnectModalOpen] =
     React.useState(false);
-
   const askForHelp = () => {
     if (!isConnected) {
       open();
     }
-  };
-
-  const displayHint = () => {
-    console.log('displayHint');
   };
 
   const closeModal = () => {
@@ -200,11 +206,25 @@ const NeedHelp = () => {
       }}
       onClick={askForHelp}
     >
-      <HelpText>Need help?</HelpText>
-      {isConnected && <PayForHint paymentWalletAddress={PAY_ADDRESS} displayHint={displayHint} />}
+      <HelpText>Need help? See if Chat GPT can help!</HelpText>
+      {isConnected && (
+        <PayForHint
+          paymentWalletAddress={PAY_ADDRESS}
+          displayHint={displayHint}
+        />
+      )}
     </div>
   );
 };
+
+const AIReponse = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  color: #8a6d8f;
+  margin: 0.5rem 0;
+`;
 
 const ClueCard: React.FC = () => {
   const [prevClueText, setPrevClueText] = useState<string | undefined>(
@@ -223,6 +243,10 @@ const ClueCard: React.FC = () => {
   const [springProps, setSpringProps] = useSpring(() => ({
     transform: "translateY(100%)",
   }));
+  const [hintResponse, setHintResponse] = useState<string | undefined>(
+    undefined
+  );
+
   useEffect(() => {
     if (focusedWord && focusedWord?.clueText != prevClueText) {
       setSpringProps({
@@ -237,24 +261,38 @@ const ClueCard: React.FC = () => {
     dispatch({ type: "SET_SHOW_CLUE_LIST", payload: true });
   };
   const handleSelectWord = (wordDirection: WordDirection) => {
-    if(wordDirection === 'next') {
+    if (wordDirection === "next") {
       dispatch({ type: "SELECT_NEXT_WORD" });
     } else {
       dispatch({ type: "SELECT_PREVIOUS_WORD" });
     }
   };
+
+  const displayHint = async () => {
+    console.log("displayHint");
+    const message = await generateMessage(focusedWord?.clueText || '', focusedWord?.letterPositions?.length || 0);
+    setHintResponse(message);
+  };
+
   return (
     <>
       {focusedWord && !appState?.showClueList && (
         <CardContainer style={springProps}>
           <ClueTitle>
-            <ChangeWord onClick={() => handleSelectWord('previous')}>&lt;</ChangeWord>
+            <ChangeWord onClick={() => handleSelectWord("previous")}>
+              &lt;
+            </ChangeWord>
             {focusedWord?.questionNumber} ({focusedWord?.direction})
-            <ChangeWord onClick={() => handleSelectWord('next')}>&gt;</ChangeWord>
+            <ChangeWord onClick={() => handleSelectWord("next")}>
+              &gt;
+            </ChangeWord>
           </ClueTitle>
           <ClueContent>{focusedWord?.clueText}</ClueContent>
           <VirtualKeyboard />
-          <NeedHelp />
+          <NeedHelp
+            displayHint={displayHint}
+          />
+          <AIReponse>{hintResponse}</AIReponse>
           <InfoWrapper onClick={showClueList}>
             <BsInfoSquare />
           </InfoWrapper>

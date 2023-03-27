@@ -1,17 +1,17 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from "next";
 
 export const GRID_SIZE = 7;
 
 type Data = {
-  name: string
-}
+  name: string;
+};
 
 export interface CrosswordQuestion {
   answer: string;
   answerLength: number;
   question: string;
-  direction: 'across' | 'down';
+  direction: "across" | "down";
   questionNumber: number;
   startX: number;
   startY: number;
@@ -29,7 +29,7 @@ export interface CrosswordCell {
   rootCellQuestionNumber: number;
   position: Position;
   isFocused?: boolean;
-  isFocusedDirection?: 'across' | 'down';
+  isFocusedDirection?: "across" | "down";
   isFocusedLetter?: boolean;
   isHovering?: boolean;
   letterPositionAcross?: number;
@@ -42,81 +42,80 @@ export interface CrosswordWord {
   questionNumber: number;
   clueText: string;
   letterPositions: Position[];
-  direction: 'across' | 'down';
+  direction: "across" | "down";
   isFocused?: boolean;
   isHovering?: boolean;
 }
 
-export type WordDirection = 'next' | 'previous';
+export type WordDirection = "next" | "previous";
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  res.status(200).json({ name: 'John Doe' })
+  res.status(200).json({ name: "John Doe" });
 }
-
 
 export const crosswordTestData: CrosswordQuestion[] = [
   {
-    answer: 'RAINBOW',
+    answer: "RAINBOW",
     answerLength: 7,
-    question: 'Sky Illusion',
-    direction: 'across',
+    question: "Sky Illusion",
+    direction: "across",
     questionNumber: 1,
     startX: 0,
     startY: 0,
   },
   {
-    answer: 'BET',
+    answer: "BET",
     answerLength: 3,
-    question: 'Wager',
-    direction: 'down',
+    question: "Wager",
+    direction: "down",
     questionNumber: 2,
     startX: 4,
     startY: 0,
   },
   {
-    answer: 'WATCH',
+    answer: "WATCH",
     answerLength: 5,
-    question: 'Timepiece',
-    direction: 'down',
+    question: "Timepiece",
+    direction: "down",
     questionNumber: 3,
     startX: 6,
     startY: 0,
   },
   {
-    answer: 'RED',
+    answer: "RED",
     answerLength: 3,
-    question: 'Color of Blood',
-    direction: 'down',
+    question: "Color of Blood",
+    direction: "down",
     questionNumber: 1,
     startX: 0,
     startY: 0,
   },
   {
-    answer: 'DOUBT',
+    answer: "DOUBT",
     answerLength: 5,
-    question: 'Lack of Confidence',
-    direction: 'across',
+    question: "Lack of Confidence",
+    direction: "across",
     questionNumber: 4,
     startX: 0,
     startY: 2,
   },
   {
-    answer: 'BIN',
+    answer: "BIN",
     answerLength: 3,
-    question: 'Trash Can',
-    direction: 'down',
+    question: "Trash Can",
+    direction: "down",
     questionNumber: 5,
     startX: 3,
     startY: 2,
   },
   {
-    answer: 'FINISH',
+    answer: "FINISH",
     answerLength: 6,
-    question: 'End',
-    direction: 'across',
+    question: "End",
+    direction: "across",
     questionNumber: 6,
     startX: 1,
     startY: 4,
@@ -131,37 +130,38 @@ export const crosswordTestData: CrosswordQuestion[] = [
     startY: 4,
   },
   {
-    answer: 'ENGLAND',
+    answer: "ENGLAND",
     answerLength: 7,
-    question: 'Country in Europe',
-    direction: 'across',
+    question: "Country in Europe",
+    direction: "across",
     questionNumber: 7,
     startX: 0,
     startY: 6,
-  }
+  },
 ];
 
-export const generateMessage = async (clue: string): Promise<string> => {
-  const gptApiKey = process.env.GPT_API_KEY;
+export const generateMessage = async (
+  clue: string,
+  letterCount: number
+): Promise<string> => {
+  const gptApiKey = process.env.NEXT_PUBLIC_GPT_API_KEY;
   // Initialize GPT-3.5 API
-  const prompt = `Give me 3 guesses as to what this clue may mean in the context of a crossword puzzle: ${clue}`;
-  const response = await fetch('https://api.openai.com/v1/engine/davinci-codex/completions', {
-    method: 'POST',
+  const prompt = `Provide another clue that helps the solver figure out the answer to the clue: "${clue}".  The answer to the clue is a ${letterCount} letter word. Do not give out the answer.`;
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${gptApiKey}`,
     },
     body: JSON.stringify({
-      prompt,
-      max_tokens: 100,
-      n: 1,
-      stop: ['\n'],
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: prompt }],
     }),
   });
   const data = await response.json();
-  const message = data.choices[0].text.trim();
+  const message = data.choices[0].message.content.trim();
 
   return message;
 };
 
-export const PAY_ADDRESS = '0x48eaf9742ed24718E9dF09Ab91E1a8e91067D1eA';
+export const PAY_ADDRESS = "0x48eaf9742ed24718E9dF09Ab91E1a8e91067D1eA";
