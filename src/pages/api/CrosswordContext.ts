@@ -458,15 +458,11 @@ export function crosswordReducer(
       const nextIndex =
         currentIndex + 1 < wordsInDirection.length ? currentIndex + 1 : 0;
       const nextWord = wordsInDirection[nextIndex];
-      console.log("select next word", nextWord);
       //iterate over all cells matching nextWord letterpositions and select the cell after the one that matches focusedletter, otherwise select the first cell
       let nextCell: CrosswordCell | null = null;
       nextWord.letterPositions.some((position) => {
-        console.log("position", position);
         const cell = crossword.grid[position.y][position.x];
-        console.log("cell", cell?.letter);
         if (cell?.letter == undefined || cell?.letter == "") {
-          console.log("cell is empty, assigning nextCell");
           nextCell = cell;
           return true;
         }
@@ -477,18 +473,27 @@ export function crosswordReducer(
             nextWord?.letterPositions[0].x
           ];
       }
-      console.log("nextCell", nextCell);
       const updatedGrid = crossword.grid.map((row) =>
         row.map((cell) => {
           if (cell) {
-            console.log("cell id", cell?.id);
-            console.log("nextCell id", nextCell?.id);
             return cell && cell.id === nextCell?.id
               ? {
                   ...cell,
                   isFocused: true,
                   isFocusedDirection: nextWord.direction,
                   isFocusedLetter: true,
+                }
+              : //check if cell shares coordinate space with nextWord
+              nextWord.letterPositions.some(
+                  (position) =>
+                    position.x === cell?.position?.x &&
+                    position.y === cell?.position?.y
+                ) && cell?.id !== nextCell?.id
+              ? {
+                  ...cell,
+                  isFocused: true,
+                  isFocusedDirection: nextWord.direction,
+                  isFocusedLetter: false,
                 }
               : {
                   ...cell,
@@ -527,10 +532,20 @@ export function crosswordReducer(
       const prevIndex =
         currentIndex === 0 ? wordsInDirection.length - 1 : currentIndex - 1;
       const prevWord = wordsInDirection[prevIndex];
-      const prevCell =
-        crossword.grid[prevWord.letterPositions[0].y][
-          prevWord.letterPositions[0].x
-        ];
+      let prevCell: CrosswordCell | null = null;
+      prevWord.letterPositions.some((position) => {
+        const cell = crossword.grid[position.y][position.x];
+        if (cell?.letter == undefined || cell?.letter == "") {
+          prevCell = cell;
+          return true;
+        }
+      });
+      if (!prevCell) {
+        prevCell =
+          crossword.grid[prevWord?.letterPositions[0].y][
+            prevWord?.letterPositions[0].x
+          ];
+      }
 
       const updatedGrid = crossword.grid.map((row) =>
         row.map((cell) => {
@@ -541,6 +556,18 @@ export function crosswordReducer(
                   isFocused: true,
                   isFocusedDirection: prevWord.direction,
                   isFocusedLetter: true,
+                }
+              : //check if cell shares coordinate space with nextWord
+              prevWord.letterPositions.some(
+                  (position) =>
+                    position.x === cell?.position?.x &&
+                    position.y === cell?.position?.y
+                ) && cell?.id !== prevCell?.id
+              ? {
+                  ...cell,
+                  isFocused: true,
+                  isFocusedDirection: prevWord.direction,
+                  isFocusedLetter: false,
                 }
               : {
                   ...cell,

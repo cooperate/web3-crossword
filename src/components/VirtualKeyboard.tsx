@@ -129,7 +129,6 @@ const VirtualKeyboard: React.FC = () => {
     } else if (typeof key == "string") {
       key = key.toUpperCase();
       if (cellData) {
-        console.log("entering letter for cellData", cellData);
         dispatch({
           type: "SET_LETTER",
           payload: {
@@ -156,7 +155,6 @@ const VirtualKeyboard: React.FC = () => {
             cellData?.wordLengthAcross != undefined &&
             cellData?.letterPositionAcross === cellData?.wordLengthAcross - 1
           ) {
-            console.log("setting focus to same cell", cellData);
             dispatch({
               type: "SET_LETTER_FOCUS",
               payload: {

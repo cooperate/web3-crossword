@@ -424,7 +424,7 @@ export const Cell: React.FC<CellProps> = ({
           if (
             cellData?.letterPositionAcross != undefined &&
             cellData?.wordLengthAcross != undefined &&
-            cellData?.letterPositionAcross < cellData?.wordLengthAcross
+            cellData?.letterPositionAcross < (cellData?.wordLengthAcross - 1)
           ) {
             dispatch({
               type: "SET_LETTER_FOCUS",
@@ -433,12 +433,21 @@ export const Cell: React.FC<CellProps> = ({
                 y: cellData?.position?.y || 0,
               },
             });
+          } else if(
+            cellData?.letterPositionAcross != undefined &&
+            cellData?.wordLengthAcross != undefined &&
+            cellData?.letterPositionAcross == (cellData?.wordLengthAcross - 1)
+          ) {
+            console.log("select next word");
+            dispatch({
+              type: "SELECT_NEXT_WORD"
+            });
           }
         } else if (cellData?.isFocusedDirection == "down") {
           if (
             cellData?.letterPositionDown != undefined &&
             cellData?.wordLengthDown != undefined &&
-            cellData?.letterPositionDown < cellData?.wordLengthDown
+            (cellData?.letterPositionDown < cellData?.wordLengthDown - 1)
           ) {
             dispatch({
               type: "SET_LETTER_FOCUS",
@@ -446,6 +455,14 @@ export const Cell: React.FC<CellProps> = ({
                 x: cellData?.position?.x || 0,
                 y: cellData?.position?.y + 1 || 0,
               },
+            });
+          } else if(
+            cellData?.letterPositionDown != undefined &&
+            cellData?.wordLengthDown != undefined &&
+            (cellData?.letterPositionDown == cellData?.wordLengthDown -1)
+          ) {
+            dispatch({
+              type: "SELECT_NEXT_WORD"
             });
           }
         }
@@ -455,7 +472,6 @@ export const Cell: React.FC<CellProps> = ({
   };
 
   useEffect(() => {
-    console.log("Crossword.tsx cellData?.isFocusedLetter", cellData?.isFocusedLetter);
     if (cellContentRef.current && cellData?.isFocusedLetter) {
       cellContentRef.current.focus();
     }

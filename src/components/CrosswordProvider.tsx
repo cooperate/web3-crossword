@@ -46,7 +46,6 @@ export const CrosswordProvider = ({
 
   useEffect(() => {
     const savedState = loadStateFromLocalStorage();
-    console.log("savedState", savedState);
     setInitialState((prevState) => ({
       state: savedState || prevState.state,
       isLoaded: true,
@@ -61,14 +60,12 @@ export const CrosswordProvider = ({
   }, [initialState?.state]);
 
   useEffect(() => {
-    console.log("crossword", crossword);
     if (
       crossword &&
       Object.keys(crossword).length > 0 &&
       crossword?.grid != initialDefault?.grid
     ) {
       saveStateToLocalStorage(crossword);
-      console.log("writing to local storage", crossword.grid);
     }
   }, [crossword]);
   return (

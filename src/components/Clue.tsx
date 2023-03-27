@@ -269,7 +269,6 @@ const ClueCard: React.FC = () => {
   };
 
   const displayHint = async () => {
-    console.log("displayHint");
     const message = await generateMessage(focusedWord?.clueText || '', focusedWord?.letterPositions?.length || 0);
     setHintResponse(message);
   };
