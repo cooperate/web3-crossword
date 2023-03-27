@@ -255,18 +255,14 @@ export function crosswordReducer(
               ...word,
               isFocused: isDifferentAxis,
             };
-            if (isDifferentAxis) {
-              appState.selectedWord = newWord;
-            }
+            appState.selectedWord = newWord;
             return newWord;
           } else if (!prevFocusedWord && coordinateSpaceWords.length > 1) {
             const newWord = {
               ...word,
               isFocused: word === coordinateSpaceWords[0],
             };
-            if (word === coordinateSpaceWords[0]) {
-              appState.selectedWord = newWord;
-            }
+            appState.selectedWord = newWord;
             return newWord;
           } else {
             const newWord = {
