@@ -36,7 +36,6 @@ const CardContainer = styled(animated.div)`
   justify-content: center;
   align-items: center;
   max-width: 80%;
-  width: 500px;
   z-index: 10;
   color: black;
   display: flex;

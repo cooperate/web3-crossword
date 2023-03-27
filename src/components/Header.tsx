@@ -27,12 +27,19 @@ flex-direction: column;
       text-decoration: underline;
     }
   }
+  @media (max-width: 900px) {
+    display: none;
+  }
+`;
+
+const Title = styled.h1`
+  font-size: clamp(1.5rem, 8vw, 2.5rem);
 `;
 
 export const Header = () => (
   <Container>
     <Web3Button />
-    <h1>CROSSw<span style={{color: "#8a6d8f"}}>3</span>b</h1>
+    <Title>CROSSw<span style={{color: "#8a6d8f"}}>3</span>b</Title>
     <ENSName>
       <span>A website by</span>
       <a

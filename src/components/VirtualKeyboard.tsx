@@ -37,7 +37,8 @@ const Key = styled.button`
   border: none;
   background-color: #ffffff;
   padding: 10px;
-  font-size: 18px;
+  font-size: clamp(0.8rem, 2vw, 1.5rem);
+  text-transform: uppercase;
   text-align: center;
   cursor: pointer;
   border-radius: 5px;
