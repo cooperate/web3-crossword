@@ -42,7 +42,6 @@ const LinksWrapper = styled(animated.div)`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  margin-bottom: 100px;
 `;
 
 const LinksContainer = styled.div`

@@ -73,6 +73,14 @@
   border-radius: var(--border-radius);
 }
 
+.linksSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
 .code {
   font-weight: 700;
   font-family: var(--font-mono);

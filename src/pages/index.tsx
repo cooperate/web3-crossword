@@ -22,7 +22,7 @@ import { useScroll, useSpring, animated } from "@react-spring/web";
 import { Scrollbars } from "react-custom-scrollbars-2";
 import { Links } from "@/components/Links";
 import styled from "@emotion/styled";
-import { Header } from "@/components/Header";
+import { ENSName, Header } from "@/components/Header";
 import { SubmitCrossword } from "@/components/SubmitCrossword";
 
 const chains = [arbitrum, mainnet, polygon];
@@ -115,16 +115,29 @@ export default function Home() {
               </div>
             </div>
             <div className={styles.aboutSection}>
-              <animated.h2>This is a <span style={{color: "#8a6d8f"}}>&lt;</span>Web3<span style={{color: "#8a6d8f"}}>&gt;</span> Crossword<span style={{color: "#8a6d8f"}}>.</span></animated.h2>
+              <animated.h2>
+                This is a <span style={{ color: "#8a6d8f" }}>&lt;</span>Web3
+                <span style={{ color: "#8a6d8f" }}>&gt;</span> Crossword
+                <span style={{ color: "#8a6d8f" }}>.</span>
+              </animated.h2>
               <animated.p>
-                Fill out this weekly crossword. If you&apos;re feeling confident, you
-                may submit your results. The first person to submit a 100%
-                correct puzzle receives the weekly prize! Take your time and
-                most importantly...have fun!
+                Fill out this weekly crossword. If you&apos;re feeling
+                confident, you may submit your results. The first person to
+                submit a 100% correct puzzle receives the weekly prize! Take
+                your time and most importantly...have fun!
               </animated.p>
             </div>
             <div className={styles.linksSection}>
               <Links />
+              <ENSName style={{textAlign: "center", alignItems: "center"}}>
+                <span>A website by</span>
+                <a
+                  href="https://app.ens.domains/name/brettcizmar.eth/details"
+                  target="_blank"
+                >
+                  brettcizmar.eth
+                </a>
+              </ENSName>
             </div>
           </main>
         </Scrollbars>

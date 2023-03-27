@@ -12,7 +12,7 @@ const Container = styled.div`
   gap: 16px;
 `;
 
-const ENSName = styled.div`
+export const ENSName = styled.div`
 display: flex;
 justify-content: center;
 align-items: end;
